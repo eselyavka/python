@@ -4,16 +4,16 @@ import logging
 import getopt
 import os
 import sys
-import pdb
 
 host = 'localhost'
 dbname = 'database'
 user = 'user'
 password = 'password'
 port = 5432
-critical = '80,80,52428800,1073741824'
-warning = 'aa,50,524288000,5368709120'
+warning = '268435456,536870912'
+critical = '1073741824,2147483648'
 verbose = None
+entity = 'index'
 
 def BloatTableSQL():
     return """
@@ -267,23 +267,25 @@ ORDER BY 2
  ,4;
 """
 
-logging.basicConfig(level = logging.DEBUG)
-
 def usage():
-    print 'Usage ' + sys.argv[0] + ' [-H/--host] [-d/--dbname] [-u/--user] [-p/--password] [-o/--port] [-c/--critical] [-w/--warning] [-v/--verbose] [-h/--help]'
+    global warning
+    global critical
+
+    print 'Usage ' + sys.argv[0] + ' [-H/--host] [-d/--dbname] [-u/--user] [-p/--password] [-o/--port] [-c/--critical] [-w/--warning] [-e/--entity] [-v/--verbose] [-h/--help]'
     print '\t -H Database server host to connect'
     print '\t -d Database to connect'
     print '\t -u DB user'
     print '\t -p DB password'
     print '\t -o DB port'
-    print '\t -c Critical percent of bloating idx,table default is 80%,80%,52428800,1073741824'
-    print '\t -w Warning percent of bloating idx,table default is 50%,50%,524288000,5368709120'
+    print '\t -c Critical size of bloating index,table, default is %s' % warning
+    print '\t -w Warning size of bloating index,table, default is %s' %  critical
+    print '\t -e Which entity check for bloat index or table, default is "index"'
     print '\t -v Some verbose output'
     print '\t -h Print this help'
   
 def parseArg():
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'h:H:d:u:p:o:w:c:v:swsc', ["help", "file=", "host=", "dbname=", "user=", "password=", "port=", "warning=", "critical=", "verbose"])
+        opts, args = getopt.getopt(sys.argv[1:], 'h:H:d:u:p:o:w:c:e:v', ["help", "host=", "dbname=", "user=", "password=", "port=", "warning=", "critical=", "entity=", "verbose"])
     except getopt.GetoptError, err:
         print str(err)
         usage()
@@ -297,8 +299,9 @@ def parseArg():
     global host
     global critical
     global warning
+    global entity
     global verbose
-  
+
     for o, a in opts:
         if o in ("-v", "--verbose"):
             verbose = True
@@ -319,16 +322,20 @@ def parseArg():
             critical = a
         elif o in ("-w", "--warning"):
             warning = a
+        elif o in ("-e", "--entity"):
+            entity = a
         else:
             assert False, "unhandled option"
+
 def parseThreashold( threashold ):
     thresholdList = threashold.split(",")
     for t in thresholdList:
         try:
           int(t)
         except ValueError:
-          print "UNKNOWN: Invalid threshold input"
-          sys.exit(1)
+          logging.debug('Threashold value: %s' % t)     
+          print 'UNKNOWN: Invalid threshold value'
+          sys.exit(3)
     return thresholdList
     
 def dbQuery(query, user, password, dbname, host, port):
@@ -342,15 +349,17 @@ def dbQuery(query, user, password, dbname, host, port):
         conn.close()
         return rows
       except StandardError, e:
-        logging.error('Can''t execute query: %s' % query)
-        if verbose: logging.error('Postgresql error code: %s' % e.pgcode)
-        if verbose: logging.error('Postgresql error message: %s' % e.pgerror)
+        print 'UNKNOWN: Can\'t execute query'
+        logging.debug('Can\'t execute query: %s' % query)
+        logging.debug('Postgresql error code: %s' % e.pgcode)
+        logging.debug('Postgresql error message: %s' % e.pgerror)
         curs.close()
         conn.close()
-        sys.exit(1)
-    except:
-      logging.error('Can''t create DB connection')
-      sys.exit(1)
+        sys.exit(3)
+    except Exception, e:
+      print 'UNKNOWN: Can\'t create DB connection'
+      logging.debug('Can\'t create DB connection\n' + str(e))
+      sys.exit(3)
 
 def nagiosStringComposition( severityList, severityName ):
     if severityList:
@@ -363,63 +372,98 @@ def nagiosStringComposition( severityList, severityName ):
                 severityStr += ','
         return severityName +': ' + severityStr
     else:
-        if verbose: logging.debug('Empty severity list in nagiosStringComposition')
-        print 'UNKNOWN'
+        logging.debug('Empty severity list in nagiosStringComposition')
+        print 'UNKNOWN empty severity list'
+        sys.exit(3)
 
-def nagiosOutput( queryData ):
+def nagiosOutput(queryData):
     warnList = []
     critList = []
-    unknownList = []
+    okList = []
 
     global warning
     global critical
+    global entity
 
-    idxPercentWarn,tblPercentWarn,idxSizeWarn,tblSizeWarn = parseVars(warning)
-    idxPercentCrit,tblPercentCrit,idxSizeCrit,tblSizeCrit = parseVars(critical)
+    idxSizeWarn,tblSizeWarn = parseThreashold(warning)
+    idxSizeCrit,tblSizeCrit = parseThreashold(critical)
 
     if queryData:
         for r in queryData:
-            if ( warning <= float(r[4]) <= critical ):
-                warnList.append(r[3])
-            elif ( float(r[4]) > critical ):
-                critList.append(r[3])
+            if entity == 'index':
+                if (int(idxSizeWarn) <= int(r[6]) < int(idxSizeCrit)):
+                    warnList.append(r[3])
+                elif (int(r[6]) >= int(idxSizeCrit)):
+                    critList.append(r[3])
+                else:
+                    okList.append(r[3])
+            elif entity == 'table':
+                if (int(tblSizeWarn) <= int(r[6]) < int(tblSizeCrit)):
+                    warnList.append(r[3])
+                elif (int(r[6]) >= int(tblSizeCrit)):
+                    critList.append(r[3])
+                else:
+                    okList.append(r[3])
             else:
-                unknownList.append(r[3])
+                logging.debug('Entity type: %s' % entity)
+                print 'UNKNOWN entity type'
+                return 3
+
     else:
-        if verbose: logging.debug('Empty query result')
-        print 'OK'
-        return 0
+        print 'UNKNOWN empty query result set'
+        return 3
   
     if critList:
-         if verbose: logging.debug('Critical list: ' % critList)
+         logging.debug('Critical list: %s' % critList)
          print nagiosStringComposition( critList, 'CRITICAL' )  
          return 2
     elif warnList:
-         if verbose: logging.debug('Warning list: ' % warnList)
+         logging.debug('Warning list: %s' % warnList)
          print nagiosStringComposition( warnList, 'WARNING' )
          return 1
-    elif unknownList:
-         if verbose: logging.debug('Unknown list: ' % unknownList)
-         print nagiosStringComposition( unknownList, 'UNKNOWN' )
-         return 3
+    elif okList:
+         logging.debug('OK list: %s' % okList)
+
+         if entity.endswith('x'):
+             print 'OK all %ses seems to be ok' % entity 
+         else:
+             print 'OK all %ss seems to be ok' % entity
+         return 1
+
     else:
-        if verbose: logging.debug('Unexpected values in query: %s' % readSqlFileName(file))
-        print 'UNKNOWN'
+        logging.debug('All metrics is empty, check query: %s' % queryData)
+        print 'UNKNOWN no query data'
         return 3
 
 def main():
+    global entity
+    global user
+    global password
+    global dbname
+    global host
+    global port
+    global verbose
+
     parseArg()
+
+    if verbose:
+        logging.basicConfig(level = logging.DEBUG)
+    else:
+        logging.basicConfig(level = logging.INFO)
 
     indexQuery = BloatIndexSQL()
     tableQuery = BloatTableSQL()
 
-    global warning
-    a,b,c,d = parseThreashold(warning)
-    print a,b,c,d       
-
-#    resList = dbQuery( indexQuery, user, password, dbname, host, port )
-#    sys.exit ( nagiosOutput ( resList ) )
+    if entity == 'index':
+        rowsList = dbQuery(indexQuery, user, password, dbname, host, 5433)
+        sys.exit ( nagiosOutput ( rowsList ) )
+    elif entity == 'table':
+        rowsList = dbQuery(tableQuery, user, password, dbname, host, 5433)
+        sys.exit ( nagiosOutput ( rowsList ) )
+    else:
+        logging.debug('Unknown entity type: %s' % entity)
+        print 'UNKNOWN entity type'
+        sys.exit(3)
 
 if __name__=='__main__':
     main()
-
