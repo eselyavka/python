@@ -4,7 +4,7 @@ import os
 import sys
 import shutil
 import getopt
-import prepare_database_work as pd
+import prepare_database as pd
 import logging
 import subprocess
 
