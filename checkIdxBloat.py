@@ -329,14 +329,26 @@ def parseArg():
 
 def parseThreashold( threashold ):
     thresholdList = threashold.split(",")
-    for t in thresholdList:
+    
+    if len(thresholdList) == 1:
         try:
-          int(t)
-        except ValueError:
-          logging.debug('Threashold value: %s' % t)     
-          print 'UNKNOWN: Invalid threshold value'
-          sys.exit(3)
-    return thresholdList
+            int(threashold)
+            thresholdList.append(None)
+            return thresholdList
+        except:
+            logging.debug('Threashold value: %s' % t)     
+            print 'UNKNOWN: Invalid threshold value'
+            sys.exit(3)
+    else:
+        for t in thresholdList:
+            try:
+                int(t)
+            except ValueError:
+                logging.debug('Threashold value: %s' % t)     
+                print 'UNKNOWN: Invalid threshold value'
+                sys.exit(3)
+    
+        return thresholdList
     
 def dbQuery(query, user, password, dbname, host, port):
     try:
@@ -386,7 +398,18 @@ def nagiosOutput(queryData):
     global entity
 
     idxSizeWarn,tblSizeWarn = parseThreashold(warning)
+
+    if not idxSizeWarn:
+        idxSizeWarn = 268435456
+    if not tblSizeWarn:
+        tblSizeWarn = 536870912
+
     idxSizeCrit,tblSizeCrit = parseThreashold(critical)
+
+    if not idxSizeCrit:
+        idxSizeCrit = 1073741824
+    if not tblSizeCrit:
+        tblSizeCrit = 2147483648  
 
     if queryData:
         for r in queryData:
