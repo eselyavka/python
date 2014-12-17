@@ -433,8 +433,8 @@ def nagiosOutput(queryData):
                 return 3
 
     else:
-        print 'UNKNOWN empty query result set'
-        return 3
+        print 'OK empty query result set'
+        return 0
   
     if critList:
          logging.debug('Critical list: %s' % critList)
@@ -451,11 +451,11 @@ def nagiosOutput(queryData):
              print 'OK all %ses seems to be ok' % entity 
          else:
              print 'OK all %ss seems to be ok' % entity
-         return 1
+         return 0
 
     else:
         logging.debug('All metrics is empty, check query: %s' % queryData)
-        print 'UNKNOWN no query data'
+        print 'UNKNOWN empty threashold list'
         return 3
 
 def main():
