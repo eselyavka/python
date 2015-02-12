@@ -1,0 +1,7 @@
+{ 
+ "type": "record",
+ "name": "Log",
+ "fields": [
+     {"name": "logline", "type": "string"}
+ ]
+}

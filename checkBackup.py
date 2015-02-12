@@ -22,8 +22,8 @@ pgPass = "postgres"
 host = "127.0.0.1"
 statisticFileName = "/tmp/pgstat"
 sender = os.getlogin() + "@" + socket.gethostname()
-receivers = ["eselyavka@okko.tv"]
-mailServer = "relay.spb.play.dc"
+receivers = ["user@example.com"]
+mailServer = "relay@example.com"
 
 
 class Error(Exception):
