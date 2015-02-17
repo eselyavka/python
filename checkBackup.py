@@ -60,7 +60,6 @@ def usage():
               [-p/--port] - postgresql listen port, default is 5433\n
               [-v/--version] - postgres version, default is 9.1\n
               """ % os.path.abspath(__file__) 
-    sys.exit(0)
 
 def generateBinDir():
     global version
@@ -373,6 +372,7 @@ def main(argv):
     for opt, arg in opts:
         if opt in ("-h", "--help"):
             usage()
+            sys.exit(0)
         elif opt in ("-a", "--archive"):
             BaseBackupArch = arg
         elif opt in ("-d", "--directory"):
@@ -390,6 +390,7 @@ def main(argv):
 
     if Directory is None or BaseBackupArch is None:
         usage()
+        sys.exit(2)
 
     stopPostgres()
     rmDir(Directory)
