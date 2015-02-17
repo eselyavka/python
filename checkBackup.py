@@ -362,7 +362,7 @@ def main(argv):
     global pgPass
    
     try:
-        opts, args = getopt.getopt(argv,"h:a:d:p:v",["help=","archive=","directory=","port=","version="])
+        opts, args = getopt.getopt(argv,"h:a:d:p:v",["help","archive=","directory=","port=","version="])
     except getopt.GetoptError:
         usage()
         sys.exit(2)
