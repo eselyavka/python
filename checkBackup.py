@@ -10,6 +10,8 @@ import subprocess
 import psycopg2
 import socket
 import smtplib
+import time
+import random
 
 #TODO one module with prepare_database
 
@@ -22,8 +24,8 @@ pgPass = "postgres"
 host = "127.0.0.1"
 statisticFileName = "/tmp/pgstat"
 sender = os.getlogin() + "@" + socket.gethostname()
-receivers = ["user@example.com"]
-mailServer = "relay@example.com"
+receivers = ["mail@example.com"]
+mailServer = "mailserver@example.com"
 
 
 class Error(Exception):
@@ -40,11 +42,22 @@ class DirectoryPathIsNotAbs(Error):
 
 class db():
     conn = None
+    delay = 0.1
+    maxDelay = 300
+    factor = 2.7
+    jitter = 0.1
+
     def __init__(self, database, user, password, host, port):
-        try:
-            self.conn = psycopg2.connect(database=database, user=user, password=password, host=host, port=port)
-        except:
-            raise RuntimeError, "Unable connect to database %s" % database
+        while (self.delay <= self.maxDelay):
+            try:
+                self.conn = psycopg2.connect(database=database, user=user, password=password, host=host, port=port)
+                logging.debug("Connect to db %s successfull on port %s" % (database,port))
+                break
+            except:
+                logging.debug("Can't connect to db %s on port %s" % (database,port))
+                time.sleep(self.delay)
+                self.delay = min(self.delay*self.factor, self.maxDelay)
+                self.delay = self.delay + random.normalvariate(self.delay, self.jitter)
 
     def __del__(self):
         if self.conn:
@@ -56,10 +69,11 @@ def usage():
               <-a/--archive> - basebackup archive\n
               <-d/--directory> - directory where to restore\n
               [-u/--user] - postgresql user, default is postgres\n
-              [-p/--password] - postgresql user password, default is postgres\n
+              [-w/--password] - postgresql user password, default is postgres\n
               [-p/--port] - postgresql listen port, default is 5433\n
               [-v/--version] - postgres version, default is 9.1\n
               """ % os.path.abspath(__file__) 
+    sys.exit(0)
 
 def generateBinDir():
     global version
@@ -72,50 +86,59 @@ def generateBinDir():
         
 def getDatabases(user, passwd, host, port):
     conn = db("postgres", user, passwd, host, port)
-    curr = conn.conn.cursor()
-    curr.execute("SELECT datname FROM pg_database WHERE datname NOT IN (%s, %s, %s)", ('postgres', 'template0', 'template1'))
-    databases = curr.fetchall()
-    curr.close()
-    del conn
-    return databases
+    if conn is not None:
+        curr = conn.conn.cursor()
+        curr.execute("SELECT datname FROM pg_database WHERE datname NOT IN (%s, %s, %s)", ('postgres', 'template0', 'template1'))
+        databases = curr.fetchall()
+        curr.close()
+        del conn
+        return databases
+    else:
+        logging.error("Can't connect to postgresql cluster")
+        return None
+     
 
 def getSampleStatistics(user, passwd, host, port):
     statistics = dict()
     bufDic = dict()
     databases = getDatabases(user, passwd, host, port)
-    query = """WITH allTables AS (
-  SELECT c.relname AS tablename
-  FROM pg_catalog.pg_class c
-  LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
-  WHERE c.relkind IN (
-  'r'
-  ,''
-  )
-  AND n.nspname <> 'pg_catalog'
-  AND n.nspname <> 'information_schema'
-  AND n.nspname !~ '^pg_toast'
-  AND pg_catalog.pg_table_is_visible(c.oid)
-  ORDER BY tablename
-  )
-  SELECT relname
-  ,n_live_tup
-  FROM pg_stat_user_tables
-  WHERE relname IN (
-  SELECT tablename
-  FROM allTables
-  )
-"""
+    if databases is not None:
+        query = """WITH allTables AS (
+      SELECT c.relname AS tablename
+      FROM pg_catalog.pg_class c
+      LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+      WHERE c.relkind IN (
+      'r'
+      ,''
+      )
+      AND n.nspname <> 'pg_catalog'
+      AND n.nspname <> 'information_schema'
+      AND n.nspname !~ '^pg_toast'
+      AND pg_catalog.pg_table_is_visible(c.oid)
+      ORDER BY tablename
+      )
+      SELECT relname
+      ,n_live_tup
+      FROM pg_stat_user_tables
+      WHERE relname IN (
+      SELECT tablename
+      FROM allTables
+      )
+    """
 
-    for e in databases:
-        for d in e:
-            conn = db(d, user, passwd, host, port)
-            curr = conn.conn.cursor()
-            curr.execute(query)
-            bufDic[d] = curr.fetchall()
-            statistics.update(bufDic)
-            curr.close()
-            del conn
-    return statistics
+        for e in databases:
+            for d in e:
+                conn = db(d, user, passwd, host, port)
+                curr = conn.conn.cursor()
+                curr.execute(query)
+                bufDic[d] = curr.fetchall()
+                statistics.update(bufDic)
+                curr.close()
+                del conn
+        return statistics
+    else:
+        logging.error("Can't fetch list of existing databases for generate statistics")
+        return None
 
 def generateHTML(requestedTablesDict, readTablesDict, diffRequestedTableDict = None, diffReadTableDict = None):
     concateStr = """<table border='1' cellpadding="1" cellspacing="1" style="width: 500px;">
@@ -187,6 +210,8 @@ Subject: Database restore statistics
         logging.error("Error: unable to send email")
    
 def compareStatistics(statistics, fileName, port):
+    if statistics is None:
+        return "<h1>Can't generate report, statistics is unavailable</h1>"
     firstTime = False
     requestedStatList = list()
     readStatList = list()
@@ -253,13 +278,16 @@ def compareStatistics(statistics, fileName, port):
 
 def analyzeDb(user, passwd, host, port):
     databases = getDatabases(user, passwd, host, port)
-    for e in databases:
-        for d in e:
-            conn = db(d, user, passwd, host, port)
-            curr = conn.conn.cursor()
-            curr.execute("ANALYZE")
-            curr.close()
-            del conn
+    if databases is not None:
+        for e in databases:
+            for d in e:
+                conn = db(d, user, passwd, host, port)
+                curr = conn.conn.cursor()
+                curr.execute("ANALYZE")
+                curr.close()
+                del conn
+    else:
+        logging.error("Can't fetch list of existing databases in cluster for analyze execution")
 
 def stopPostgres():
     global Directory
@@ -362,7 +390,7 @@ def main(argv):
     global pgPass
    
     try:
-        opts, args = getopt.getopt(argv,"h:a:d:p:v",["help","archive=","directory=","port=","version="])
+        opts, args = getopt.getopt(argv,"h:a:d:u:w:p:v",["help=","archive=","directory=","user","password","port=","version="])
     except getopt.GetoptError:
         usage()
         sys.exit(2)
@@ -372,14 +400,13 @@ def main(argv):
     for opt, arg in opts:
         if opt in ("-h", "--help"):
             usage()
-            sys.exit(0)
         elif opt in ("-a", "--archive"):
             BaseBackupArch = arg
         elif opt in ("-d", "--directory"):
             Directory = arg
         elif opt in ("-u", "--user"):
             pgUser = arg
-        elif opt in ("-p", "--password"):
+        elif opt in ("-w", "--password"):
             pgPass = arg
         elif opt in ("-p", "--port"):
             port = arg
@@ -390,17 +417,16 @@ def main(argv):
 
     if Directory is None or BaseBackupArch is None:
         usage()
-        sys.exit(2)
 
     stopPostgres()
     rmDir(Directory)
     mkDir(Directory)
     chmodDir(Directory)
-    pd.main(cleanupArgv(argv, ["-v", "--version"]))
-    createLinks('autovacuum.conf')
+    pd.main(cleanupArgv(argv, ["-v", "--version","-w", "--password", "-u", "--user"]))
+    # createLinks('autovacuum.conf')
     startPostgres()
     analyzeDb(pgUser, pgPass, host, port)
-    statStr = compareStatistics(getSampleStatistics(pgUser, pgPass, host, port),statisticFileName, port)
+    statStr = compareStatistics(getSampleStatistics(pgUser, pgPass, host, port), statisticFileName, port)
     sendEmail(sender, receivers, mailServer, statStr)
 
 if __name__=='__main__':
