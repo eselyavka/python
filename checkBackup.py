@@ -24,8 +24,8 @@ pgPass = "postgres"
 host = "127.0.0.1"
 statisticFileName = "/tmp/pgstat"
 sender = os.getlogin() + "@" + socket.gethostname()
-receivers = ["mail@example.com"]
-mailServer = "mailserver@example.com"
+receivers = ["eselyavka@okko.tv"]
+mailServer = "relay.spb.play.dc"
 
 
 class Error(Exception):
@@ -170,7 +170,7 @@ def generateHTML(requestedTablesDict, readTablesDict, diffRequestedTableDict = N
             diffStr = "<td bgcolor=\"green\">" + str(diff) + "</td>"
         else:
             diffStr = "<td>" + str(diff) + "</td>"
-        concateStr += "<td>" + v.split(":")[0] + "</td>" + "<td>" + v.split(":")[1] + "</td>" + "<td>" + str(requestedTablesDict[v]) + "</td>" + "<td>" + v.split(":")[0] + "</td>" + "<td>" + v.split(":")[1] + "</td>" + "<td>" + str(requestedTablesDict[v]) + "</td>" + diffStr
+        concateStr += "<td>" + v.split(":")[0] + "</td>" + "<td>" + v.split(":")[1] + "</td>" + "<td>" + str(requestedTablesDict[v]) + "</td>" + "<td>" + v.split(":")[0] + "</td>" + "<td>" + v.split(":")[1] + "</td>" + "<td>" + str(readTablesDict[v]) + "</td>" + diffStr
         concateStr += "</tr>"
     if diffRequestedTableDict and not diffReadTableDict:
         for k in diffRequestedTableDict.keys():
@@ -255,6 +255,7 @@ def compareStatistics(statistics, fileName, port):
             result = generateHTML(requestedTablesDict, readTablesDict, None, diffReadTableDict)
 
     elif (set(requestedTablesDict.keys()) - set(readTablesDict.keys())) and (set(readTablesDict.keys()) - set(requestedTablesDict.keys())):
+        print "f"
         diffRequestedTableDict = dict()
         for e in (set(requestedTablesDict.keys()) - set(readTablesDict.keys())):
             diffRequestedTableDict[e] = requestedTablesDict[e]
