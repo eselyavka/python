@@ -12,6 +12,7 @@ import socket
 import smtplib
 import time
 import random
+from html import HTML
 
 #TODO one module with prepare_database
 
@@ -24,8 +25,8 @@ pgPass = "postgres"
 host = "127.0.0.1"
 statisticFileName = "/tmp/pgstat"
 sender = os.getlogin() + "@" + socket.gethostname()
-receivers = ["eselyavka@okko.tv"]
-mailServer = "relay.spb.play.dc"
+receivers = ["email@example.com"]
+mailServer = "relay.example.com"
 
 
 class Error(Exception):
@@ -140,60 +141,70 @@ def getSampleStatistics(user, passwd, host, port):
         logging.error("Can't fetch list of existing databases for generate statistics")
         return None
 
-def generateHTML(requestedTablesDict, readTablesDict, diffRequestedTableDict = None, diffReadTableDict = None):
-    concateStr = """<table border='1' cellpadding="1" cellspacing="1" style="width: 500px;">
-<tbody>
-<tr>
-<td colspan="3">Requested from Backup</td>
-<td colspan="3">Read from previous Backup</td>
-<td colspan="3">Difference</td>
-</tr>
-<tr>
-<td>Database</td>
-<td>Table</td>
-<td>Live tuple</td>
-<td>Database</td>
-<td>Table</td>
-<td>Live tuple</td>
-<td>Count</td>
-</tr>"""
-
-    for v in requestedTablesDict.keys():
-        concateStr += "<tr>"
+def generateHTML(unionTablesSet, requestedTablesDict, readTablesDict, diffRequestedTableDict = None, diffReadTableDict = None):
+    h = HTML()
+    t = h.table(border='1', cellpadding='1', cellspacing='1', style='width: 500px;')
+    r = t.tr
+    r.td('Requested from Backup', colspan='3')
+    r.td('Read from previous Backup', colspan='3')
+    r.td('Difference', colspan='3')
+    r = t.tr
+    r.td('Database')
+    r.td('Table')
+    r.td('Live')
+    r.td('Database')
+    r.td('Table')
+    r.td('Live')
+    r.td('Count')
+    for v in unionTablesSet:
         try:
             diff = requestedTablesDict[v] - readTablesDict[v]
         except KeyError:
             diff = 0
-        if diff < 0:
-            diffStr = "<td bgcolor=\"red\">" + str(diff) + "</td>"
-        elif diff > 0:
-            diffStr = "<td bgcolor=\"green\">" + str(diff) + "</td>"
+        r = t.tr
+        r.td(v.split(":")[0])
+        r.td(v.split(":")[1])
+        r.td(str(requestedTablesDict[v]))
+        r.td(v.split(":")[0])
+        r.td(v.split(":")[1])
+        r.td(str(readTablesDict[v]))
+        if diff > 0:
+            r.td(str(diff),bgcolor='green')
+        elif diff < 0:
+            r.td(str(diff),bgcolor='red')
         else:
-            diffStr = "<td>" + str(diff) + "</td>"
-        concateStr += "<td>" + v.split(":")[0] + "</td>" + "<td>" + v.split(":")[1] + "</td>" + "<td>" + str(requestedTablesDict[v]) + "</td>" + "<td>" + v.split(":")[0] + "</td>" + "<td>" + v.split(":")[1] + "</td>" + "<td>" + str(readTablesDict[v]) + "</td>" + diffStr
-        concateStr += "</tr>"
-    if diffRequestedTableDict and not diffReadTableDict:
+            r.td(str(diff))
+    if diffRequestedTableDict is not None and diffReadTableDict is None:
         for k in diffRequestedTableDict.keys():
-            concateStr += "<tr bgcolor=\"red\">"
-            concateStr += "<td>" + k.split(":")[0] + "</td>" + "<td>" + k.split(":")[1] + "</td>" + "<td>" + str(diffRequestedTableDict[k]) + "</td>" + "<td colspan=\"4\">Can't find corresponding table in file</td>"
-            concateStr += "</tr>"
-    elif diffReadTableDict and not diffRequestedTableDict:
+            r = t.tr(bgcolor='red')
+            r.td(k.split(":")[0])
+            r.td(k.split(":")[1])
+            r.td(str(diffRequestedTableDict[k]))
+            r.td('Can''t find corresponding table in file', colspan='4')
+    elif diffReadTableDict is not None and diffRequestedTableDict is None:
         for k in diffReadTableDict.keys():
-            concateStr += "<tr bgcolor=\"red\">"
-            concateStr += "<td colspan=\"3\">Can't find corresponding table in requested database</td>" + "<td>" + k.split(":")[0] + "</td>" + "<td>" + k.split(":")[1] + "</td>" + "<td>" + str(diffReadTableDict[k]) + "</td><td>&nbsp;</td>"
-            concateStr += "</tr>"
-    elif diffReadTableDict and diffRequestedTableDict:
+            r = t.tr(bgcolor='red')
+            r.td('Can''t find corresponding table in requested database', colspan='3')
+            r.td(k.split(":")[0])
+            r.td(k.split(":")[1])
+            r.td(str(diffReadTableDict[k]))
+            r.td(' ')
+    elif diffReadTableDict is not None and diffRequestedTableDict is not None:
         for k in diffRequestedTableDict.keys():
-            concateStr += "<tr bgcolor=\"red\">"
-            concateStr += "<td>" + k.split(":")[0] + "</td>" + "<td>" + k.split(":")[1] + "</td>" + "<td>" + str(diffRequestedTableDict[k]) + "</td>" + "<td colspan=\"4\">Can't find corresponding table in file</td>"
-            concateStr += "</tr>"
+            r = t.tr(bgcolor='red')
+            r.td(k.split(":")[0])
+            r.td(k.split(":")[1])
+            r.td(str(diffRequestedTableDict[k]))
+            r.td('Can''t find corresponding table in file', colspan='4')
         for k in diffReadTableDict.keys():
-            concateStr += "<tr bgcolor=\"red\">"
-            concateStr += "<td colspan=\"3\">Can't find corresponding table in requested database</td>" + "<td>" + k.split(":")[0] + "</td>" + "<td>" + k.split(":")[1] + "</td>" + "<td>" + str(diffReadTableDict[k]) + "</td><td>&nbsp;</td>"
-            concateStr += "</tr>"
-    concateStr += """</tbody> 
-</table>"""
-    return concateStr
+            r = t.tr(bgcolor='red')
+            r.td('Can''t find corresponding table in requested database', colspan='3')
+            r.td(k.split(":")[0])
+            r.td(k.split(":")[1])
+            r.td(str(diffReadTableDict[k]))
+            r.td(' ')
+    return str(t)
+        
 
 def sendEmail(sender, receivers, mailServer, html):
     message = """From: %s
@@ -240,34 +251,38 @@ def compareStatistics(statistics, fileName, port):
     for s in readStatList:
         readTablesDict[s.split(":")[0] + ":" + s.split(":")[1]] = long(s.split(":")[2].replace("\n",""))
     
-    if (set(requestedTablesDict.keys()) - set(readTablesDict.keys())) and not (set(readTablesDict.keys()) - set(requestedTablesDict.keys())):
+    requestedTablesSet = set(requestedTablesDict.keys()) - set(readTablesDict.keys())
+    readTablesDiffSet = set(readTablesDict.keys()) - set(requestedTablesDict.keys())
+    unionTablesSet = set(readTablesDict.keys()) & set(requestedTablesDict.keys())
+
+    if requestedTablesSet is not None and readTablesDiffSet is None:
         diffRequestedTableDict = dict()
-        for e in (set(requestedTablesDict.keys()) - set(readTablesDict.keys())):
+        for e in requestedTablesSet:
             diffRequestedTableDict[e] = requestedTablesDict[e]
 
-            result = generateHTML(requestedTablesDict, readTablesDict, diffRequestedTableDict)
+        result = generateHTML(unionTablesSet, requestedTablesDict, readTablesDict, diffRequestedTableDict)
 
-    elif (set(readTablesDict.keys()) - set(requestedTablesDict.keys())) and not (set(requestedTablesDict.keys()) - set(readTablesDict.keys())):
+    elif readTablesDiffSet is not None and requestedTablesSet is None:
         diffReadTableDict = dict()
-        for e in (set(readTablesDict.keys()) - set(requestedTablesDict.keys())):
+        for e in readTablesDiffSet:
             diffReadTableDict[e] = readTablesDict[e]
 
-            result = generateHTML(requestedTablesDict, readTablesDict, None, diffReadTableDict)
+        result = generateHTML(unionTablesSet, requestedTablesDict, readTablesDict, None, diffReadTableDict)
 
-    elif (set(requestedTablesDict.keys()) - set(readTablesDict.keys())) and (set(readTablesDict.keys()) - set(requestedTablesDict.keys())):
-        print "f"
+    elif requestedTablesSet is not None and readTablesDiffSet is not None:
+
         diffRequestedTableDict = dict()
-        for e in (set(requestedTablesDict.keys()) - set(readTablesDict.keys())):
+        for e in requestedTablesSet:
             diffRequestedTableDict[e] = requestedTablesDict[e]
         diffReadTableDict = dict()
 
-        for e in (set(readTablesDict.keys()) - set(requestedTablesDict.keys())):
+        for e in readTablesDiffSet:
             diffReadTableDict[e] = readTablesDict[e]
 
-        result = generateHTML(requestedTablesDict, readTablesDict, diffRequestedTableDict, diffReadTableDict)
+        result = generateHTML(unionTablesSet, requestedTablesDict, readTablesDict, diffRequestedTableDict, diffReadTableDict)
 
     else:
-       result = generateHTML(requestedTablesDict, readTablesDict)
+       result = generateHTML(unionTablesSet, requestedTablesDict, readTablesDict)
 
     f.seek(0,0)
     f.truncate()
