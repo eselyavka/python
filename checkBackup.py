@@ -12,21 +12,23 @@ import socket
 import smtplib
 import time
 import random
+import distutils.spawn as ds
 from html import HTML
 
 #TODO one module with prepare_database
 
-port = "5433"
-version = "9.1"
+port = '5433'
+version = '9.1'
 Directory = None
 BaseBackupArch = None
-pgUser = "postgres"
-pgPass = "postgres"
-host = "127.0.0.1"
-statisticFileName = "/tmp/pgstat"
-sender = os.getlogin() + "@" + socket.gethostname()
-receivers = ["email@example.com"]
-mailServer = "relay.example.com"
+pgUser = 'postgres'
+pgPass = 'postgres'
+host = '127.0.0.1'
+pgBin = 'pg_ctl'
+statisticFileName = '/tmp/pgstat'
+sender = os.getlogin() + '@' + socket.gethostname()
+receivers = ['nobody@example.com']
+mailServer = 'relay.example.com'
 
 
 class Error(Exception):
@@ -76,13 +78,23 @@ def usage():
               """ % os.path.abspath(__file__) 
     sys.exit(0)
 
-def generateBinDir():
-    global version
+def getAbsPath(version):
+    path = ['/usr/lib/postgresql/' + version + '/bin/' + pgBin, '/usr/pgsql-' + version + '/bin']
+    for p in path:
+        if os.access(p, os.X_OK):
+            return os.path.abspath(p)
 
-    if version: 
-        return '/usr/pgsql-' + version + '/bin'
+def generateExecutable():
+    global version
+    global pgBin
+
+    if version:
+        if ds.find_executable(pgBin) is not None:
+            return os.path.abspath(ds.find_executable(pgBin))
+        else:
+            return getAbsPath(version)
     else:
-        return '/usr/pgsql-9.1/bin'
+        return getAbsPath('9.1')
 
         
 def getDatabases(user, passwd, host, port):
@@ -310,36 +322,36 @@ def stopPostgres():
 
     FNULL = open(os.devnull, 'w')
 
-    pgBinDir = generateBinDir()
+    pgExecutable = generateExecutable()
 
-    if os.path.exists(pgBinDir):
+    if os.path.exists(pgExecutable):
        try:
-           subprocess.check_call([pgBinDir+'/'+'pg_ctl', 'stop', '-D', Directory, '-m', 'fast'], stdout=FNULL, stderr=subprocess.STDOUT)
-           logging.info("Postmaster is stoped")
+           subprocess.check_call([pgExecutable, 'stop', '-D', Directory, '-m', 'fast'], stdout=FNULL, stderr=subprocess.STDOUT)
+           logging.info("Postmaster is stoped in directory %s" % Directory)
        except subprocess.CalledProcessError:
-           logging.info("Postmaster already stoped")
+           logging.info("Postmaster already stoped in directory %s" % Directory)
        except Exception:
            raise
     else:
-        raise OSError, 'Directory %s doesn\'t exists' % pgBinDir
+        raise OSError, 'File %s doesn\'t exists' % pgExecutable
 
 def startPostgres():
     global Directory
 
     FNULL = open(os.devnull, 'w')
 
-    pgBinDir = generateBinDir()
+    pgExecutable = generateExecutable()
 
-    if os.path.exists(pgBinDir):
+    if os.path.exists(pgExecutable):
        try:
-           subprocess.check_call([pgBinDir+'/'+'pg_ctl', 'start', '-D', Directory], stdout=FNULL, stderr=subprocess.STDOUT)
-           logging.info("Postmaster is started")
+           subprocess.check_call([pgExecutable, 'start', '-D', Directory], stdout=FNULL, stderr=subprocess.STDOUT)
+           logging.info("Postmaster is started in directory %s" % Directory)
        except subprocess.CalledProcessError:
-           logging.info("Postmaster can't start, check postmaster log output")
+           logging.info("Postmaster can't start in directory %s, check postmaster log output" % Directory)
        except Exception:
            raise
     else:
-        raise OSError, 'Directory %s doesn\'t exists' % pgBinDir
+        raise OSError, 'File %s doesn\'t exists' % pgExecutable
 
 def createLinks(linkName):
     global Directory 
@@ -371,15 +383,6 @@ def checkDir(path):
     else:
         raise DirectoryNotExists, "Directory %s doesn't exists" % path
 
-def rmDir(path):
-    try:
-        checkDir(path)
-        shutil.rmtree(path)
-    except DirectoryPathIsNotAbs, e:
-        raise DirectoryPathIsNotAbs, e
-    except DirectoryNotExists, e:
-        raise DirectoryNotExists, e
-
 def mkDir(path):
     try:
         checkDir(path)
@@ -387,6 +390,16 @@ def mkDir(path):
         raise DirectoryPathIsNotAbs, e
     except DirectoryNotExists:
         os.mkdir(path)
+
+def rmDir(path):
+    try:
+        checkDir(path)
+        shutil.rmtree(path)
+    except DirectoryPathIsNotAbs, e:
+        raise DirectoryPathIsNotAbs, e
+    except DirectoryNotExists, e:
+        mkDir(path)
+        chmodDir(path)
 
 def chmodDir(path, perm = 0700):
     try:
