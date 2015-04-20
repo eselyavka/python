@@ -11,7 +11,7 @@ import re
 import fileinput
 import logging
 
-logging.basicConfig(filename='prepare_database.log', filemode='w', format='%(asctime)s - %(levelname)s - %(message)s', level=logging.DEBUG)
+logging.basicConfig(filename='prepare_database.log', filemode='a', format='%(asctime)s - %(levelname)s - %(message)s', level=logging.DEBUG)
 
 def extract_file(path, to_directory):
     if path.endswith('.zip'):
@@ -21,7 +21,7 @@ def extract_file(path, to_directory):
     elif path.endswith('.tar.bz2') or path.endswith('.tbz'):
       opener, mode = tarfile.open, 'r:bz2'
     else: 
-      raise ValueError, "Could not extract %s as no appropriate extractor is found" % path
+      raise ValueError, 'Could not extract %s as no appropriate extractor is found' % path
 
     cwd = os.getcwd()
     os.chdir(to_directory)
@@ -38,11 +38,10 @@ def directory_perm(dir, user='postgres', group='postgres'):
       os.chmod(dir, 0700)
       os.chown(dir, getpwnam(user).pw_uid, getgrnam(group).gr_gid)
     except Exception:
-      print "Unexpected error:", sys.exc_info()[0]
+      print 'Unexpected error:', sys.exc_info()[0]
       raise
 
 def process_config(config, logFileName, port='5433'):
-   
     with open(config, 'r+') as fconf:
       lines = fconf.readlines()
       fconf.seek(0)
@@ -52,6 +51,8 @@ def process_config(config, logFileName, port='5433'):
             fconf.write(re.sub(r'^[#]?port.+', 'port = ' + port, line))
         elif (re.search(r'^[#]?log_filename.+', line)):
             fconf.write(re.sub(r'^[#]?log_filename.+', 'log_filename = \'postgresql-' + logFileName + '.log\'', line))
+        elif (re.search(r'^[#]?stats_temp_directory.+', line)):
+            fconf.write(re.sub(r'^[#]?stats_temp_directory.+', 'stats_temp_directory = \'/ramdisk/pgstat/' + logFileName + '\'', line))
         else:
             fconf.write(line)
 
