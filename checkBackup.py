@@ -7,13 +7,12 @@ import getopt
 import prepare_database as pd
 import logging
 import subprocess
-import psycopg2
 import socket
 import smtplib
 import time
-import random
 import distutils.spawn as ds
 from html import HTML
+import database
 
 #TODO one module with prepare_database
 
@@ -26,9 +25,12 @@ pgPass = 'postgres'
 host = '127.0.0.1'
 pgBin = 'pg_ctl'
 statisticFileName = '/tmp/pgstat'
-sender = os.getlogin() + '@' + socket.gethostname()
-receivers = ['nobody@example.com']
-mailServer = 'relay.example.com'
+try:
+    sender = os.getlogin() + '@' + socket.gethostname()
+except OSError:
+    sender = 'cron'
+receivers = ['evg.selyavka@gmail.com','aladin@okko.tv','sburdakov@okko.tv']
+mailServer = 'relay.spb.play.dc'
 
 
 class Error(Exception):
@@ -42,29 +44,6 @@ class DirectoryNotExists(Error):
 class DirectoryPathIsNotAbs(Error):
     """Raised when directory path isn't absolute"""
     pass
-
-class db():
-    conn = None
-    delay = 0.1
-    maxDelay = 300
-    factor = 2.7
-    jitter = 0.1
-
-    def __init__(self, database, user, password, host, port):
-        while (self.delay <= self.maxDelay):
-            try:
-                self.conn = psycopg2.connect(database=database, user=user, password=password, host=host, port=port)
-                logging.debug("Connect to db %s successfull on port %s" % (database,port))
-                break
-            except:
-                logging.debug("Can't connect to db %s on port %s" % (database,port))
-                time.sleep(self.delay)
-                self.delay = min(self.delay*self.factor, self.maxDelay)
-                self.delay = self.delay + random.normalvariate(self.delay, self.jitter)
-
-    def __del__(self):
-        if self.conn:
-            self.conn.close()
 
 def usage():
     print """%s, usage\n
@@ -98,16 +77,17 @@ def generateExecutable():
 
         
 def getDatabases(user, passwd, host, port):
-    conn = db("postgres", user, passwd, host, port)
-    if conn is not None:
-        curr = conn.conn.cursor()
-        curr.execute("SELECT datname FROM pg_database WHERE datname NOT IN (%s, %s, %s)", ('postgres', 'template0', 'template1'))
+    ch = database.DB('postgres', user, passwd, host, port)
+    logging.debug('ch: %s', ch)
+    if ch.conn is not None:
+        curr = ch.conn.cursor()
+        curr.execute('SELECT datname FROM pg_database WHERE datname NOT IN (%s, %s, %s)', ('postgres', 'template0', 'template1'))
         databases = curr.fetchall()
         curr.close()
-        del conn
+        del ch
         return databases
     else:
-        logging.error("Can't connect to postgresql cluster")
+        logging.error('Can\'t connect to postgresql cluster due to timeout')
         return None
      
 
@@ -116,7 +96,7 @@ def getSampleStatistics(user, passwd, host, port):
     bufDic = dict()
     databases = getDatabases(user, passwd, host, port)
     if databases is not None:
-        query = """WITH allTables AS (
+        query = '''WITH allTables AS (
       SELECT c.relname AS tablename
       FROM pg_catalog.pg_class c
       LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
@@ -137,20 +117,21 @@ def getSampleStatistics(user, passwd, host, port):
       SELECT tablename
       FROM allTables
       )
-    """
+    '''
 
         for e in databases:
             for d in e:
-                conn = db(d, user, passwd, host, port)
-                curr = conn.conn.cursor()
+                ch = database.DB(d, user, passwd, host, port)
+                curr = ch.conn.cursor()
                 curr.execute(query)
                 bufDic[d] = curr.fetchall()
+                logging.debug('Db statistics dict %s' % bufDic)
                 statistics.update(bufDic)
                 curr.close()
-                del conn
+                del ch
         return statistics
     else:
-        logging.error("Can't fetch list of existing databases for generate statistics")
+        logging.error('Can\'t fetch list of existing databases for generate statistics')
         return None
 
 def generateHTML(unionTablesSet, requestedTablesDict, readTablesDict, diffRequestedTableDict = None, diffReadTableDict = None):
@@ -219,18 +200,18 @@ def generateHTML(unionTablesSet, requestedTablesDict, readTablesDict, diffReques
         
 
 def sendEmail(sender, receivers, mailServer, html):
-    message = """From: %s
+    message = '''From: %s
 To: %s
 MIME-Version: 1.0
 Content-type: text/html
 Subject: Database restore statistics
-""" % (sender, ",".join(receivers))
+''' % (sender, ','.join(receivers))
     try:
         smtpObj = smtplib.SMTP(mailServer)
         smtpObj.sendmail(sender, receivers, message+html)
-        logging.info("Successfully sent email")
+        logging.info('Successfully sent email')
     except SMTPException:
-        logging.error("Error: unable to send email")
+        logging.error('Error: unable to send email')
    
 def compareStatistics(statistics, fileName, port):
     if statistics is None:
@@ -238,18 +219,23 @@ def compareStatistics(statistics, fileName, port):
     firstTime = False
     requestedStatList = list()
     readStatList = list()
-    result = ""
+    result = ''
+
     try:
         f = open(fileName + "_" + port, 'r+')
+        logging.debug('File %s successfully open' % (fileName + "_" + port))
     except IOError:
         firstTime = True
         try:
             f = open(fileName + "_" + port, 'w+')
+            logging.debug('File %s successfully open in first time' % (fileName + "_" + port))
         except IOError:
-            raise IOError, "Can't open file %s" % fileName + "_" + port
+            raise IOError, "Can't open file %s" % (fileName + "_" + port)
+
     for d in statistics.keys():
         for tables in statistics[d]:
                 requestedStatList.append(d + ":" + tables[0] + ":" + str(tables[1]) + "\n")
+
     if firstTime:
         readStatList = requestedStatList
     else:
@@ -260,6 +246,7 @@ def compareStatistics(statistics, fileName, port):
 
     for s in requestedStatList:
         requestedTablesDict[s.split(":")[0] + ":" + s.split(":")[1]] = long(s.split(":")[2].replace("\n",""))
+
     for s in readStatList:
         readTablesDict[s.split(":")[0] + ":" + s.split(":")[1]] = long(s.split(":")[2].replace("\n",""))
     
@@ -306,16 +293,18 @@ def compareStatistics(statistics, fileName, port):
 
 def analyzeDb(user, passwd, host, port):
     databases = getDatabases(user, passwd, host, port)
+    logging.debug('Database list %s' % databases)
     if databases is not None:
         for e in databases:
             for d in e:
-                conn = db(d, user, passwd, host, port)
-                curr = conn.conn.cursor()
-                curr.execute("ANALYZE")
+                ch = database.DB(d, user, passwd, host, port)
+                curr = ch.conn.cursor()
+                logging.debug('Perform ANALYZE on %s database' % d)
+                curr.execute('ANALYZE')
                 curr.close()
-                del conn
+                del ch
     else:
-        logging.error("Can't fetch list of existing databases in cluster for analyze execution")
+        logging.error('Can\'t fetch list of existing databases in cluster for analyze execution')
 
 def stopPostgres():
     global Directory
