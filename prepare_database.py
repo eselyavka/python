@@ -3,43 +3,13 @@
 import os
 import sys
 import getopt
-import tarfile
-import zipfile
-from pwd import getpwnam 
-from grp import getgrnam
 import re
 import fileinput
 import logging
+from ExtractFile import ExtractFile 
+from FileOperations import FileOperations
 
 logging.basicConfig(filename='prepare_database.log', filemode='a', format='%(asctime)s - %(levelname)s - %(message)s', level=logging.DEBUG)
-
-def extract_file(path, to_directory):
-    if path.endswith('.zip'):
-      opener, mode = zipfile.ZipFile, 'r'
-    elif path.endswith('.tar.gz') or path.endswith('.tgz'):
-      opener, mode = tarfile.open, 'r:gz'
-    elif path.endswith('.tar.bz2') or path.endswith('.tbz'):
-      opener, mode = tarfile.open, 'r:bz2'
-    else: 
-      raise ValueError, 'Could not extract %s as no appropriate extractor is found' % path
-
-    cwd = os.getcwd()
-    os.chdir(to_directory)
-    
-    try:
-        file = opener(path, mode)
-        try: file.extractall()
-        finally: file.close()
-    finally:
-        os.chdir(cwd)
-
-def directory_perm(dir, user='postgres', group='postgres'):
-    try:
-      os.chmod(dir, 0700)
-      os.chown(dir, getpwnam(user).pw_uid, getgrnam(group).gr_gid)
-    except Exception:
-      print 'Unexpected error:', sys.exc_info()[0]
-      raise
 
 def process_config(config, logFileName, port='5433'):
     with open(config, 'r+') as fconf:
@@ -90,18 +60,23 @@ def main(argv):
 
     if (os.path.isfile(BaseBackupArch) and os.path.exists(Directory)):
       if (os.path.isabs(BaseBackupArch) and os.path.isabs(Directory)):
-        extract_file(BaseBackupArch, Directory)
+        ExtractFile(BaseBackupArch, Directory)
 
         logging.info('Succefully extracted basebackup archive file: %s into directory: %s' % (BaseBackupArch, Directory))
+        fop = FileOperations(Directory)
 
         if DatabaseUser and DatabaseGroup:
-          directory_perm(Directory, DatabaseUser, DatabaseGroup)
+          fop.setFileOwner(DatabaseUser, DatabaseGroup)
+          fop.setFilePerm()
         elif DatabaseUser:
-          directory_perm(Directory, user=DatabaseUser)
+          fop.setFileOwner(user=DatabaseUser)
+          fop.setFilePerm()
         elif DatabaseGroup:
-          directory_perm(Directory, group=DatabaseGroup)
+          fop.setFileOwner(group=DatabaseGroup)
+          fop.setFilePerm()
         else:
-          directory_perm(Directory)
+          fop.setFileOwner()
+          fop.setFilePerm()
 
         logging.info('Succefully prepare new PGDATA directory: %s' % Directory)
 

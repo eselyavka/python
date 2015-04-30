@@ -20,13 +20,16 @@ class DirectoryIsNotAccessible(Error):
     pass
 
 class FileOperations():
+    """Common class for file operations"""
 
-    def __init__(self):
-        pass
+    dfile = None
 
-    def setFileOwner(self, sfile, user, group=-1):
+    def __init__(self, dfile):
+        self.dfile = dfile
+
+    def setFileOwner(self, user='postgres', group='postgres'):
         try:
-            os.chown(sfile, getpwnam(user).pw_uid, getgrnam(group).gr_gid)
+            os.chown(self.dfile, getpwnam(user).pw_uid, getgrnam(group).gr_gid)
         except KeyError:
             print 'Can\'t access unix user and password database', sys.exc_info()[0]
             raise
@@ -34,8 +37,8 @@ class FileOperations():
             print 'Can\'t change owner/group for target', sys.exc_info()[0]
             raise
  
-    def setFilePerm(self, sfile, perm):
+    def setFilePerm(self, perm=0700):
         try:
-            os.chmod(sfile, perm)
+            os.chmod(self.dfile, perm)
         except OSError:
             print 'Can\'t change permissions for target', sys.exc_info()[0]

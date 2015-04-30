@@ -23,6 +23,7 @@ class DB():
                 time.sleep(self.delay)
                 self.delay = min(self.delay*self.factor, self.maxDelay)
                 self.delay = self.delay + random.normalvariate(self.delay, self.jitter)
+                logging.debug("DelaySet:%s" % str(self.delay))
 
     def __del__(self):
         if self.conn is not None:
