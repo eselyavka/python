@@ -7,9 +7,9 @@ logging = logging.getLogger(__name__)
 
 class DB():
     conn = None
-    delay = 0.1
+    delay = 1
     maxDelay = 900
-    factor = 2.7
+    factor = 0.95
     jitter = 0.1
 
     def __init__(self, database, user, password, host, port):
@@ -22,7 +22,7 @@ class DB():
                 logging.debug("Delay:%s;Can't connect to db %s on port %s(ErrCode:%s, ErrMessage:%s)" % (str(self.delay),database,port,e.pgcode,e.pgerror))
                 time.sleep(self.delay)
                 self.delay = min(self.delay*self.factor, self.maxDelay)
-                self.delay = self.delay + random.normalvariate(self.delay, self.jitter)
+                self.delay = self.delay + random.gauss(self.delay, self.jitter)
                 logging.debug("DelaySet:%s" % str(self.delay))
 
     def __del__(self):

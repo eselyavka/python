@@ -2,14 +2,11 @@ import re
 
 class ProcessConfig():
     dfile = None
-    replacements = list()
+
     def __init__(self, dfile):
         self.dfile = dfile
 
-    def replacementsPush(self, replace):
-        self.replacements.append(replace)
-    
-    def replace(self, template, sfile, replacement):
+    def replace(self, template, replacement):
         with open(self.dfile, 'r+') as fh:
             lines = fh.readlines()
             fh.seek(0)
