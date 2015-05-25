@@ -8,13 +8,14 @@ import sys
 url='http://example.com:50030'
 user='eselyavka'
 sleepInterval=1
+reportFile='jobReport.txt'
 
 def signalHandler(signum, stack):
     print 'Received: %s, exiting...' % signum
     sys.exit(0);
 
 def writeRepor( jobCount=0 ):
-    with (open('jobReport.txt','a+')) as fh:
+    with (open(reportFile,'a+')) as fh:
         fh.write(str(int(time.time())) + ',' + str(jobCount) + '\n') 
 
 def requestForJson():
