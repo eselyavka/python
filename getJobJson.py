@@ -5,18 +5,19 @@ import time
 import signal
 import sys
 
-url='http://example.com:50030'
+
+url='http://example.com:50030/metrics?format=json'
 user='eselyavka'
 sleepInterval=1
-reportFile='jobReport.txt'
+reportFile='jobReport.dat'
 
 def signalHandler(signum, stack):
     print 'Received: %s, exiting...' % signum
     sys.exit(0);
 
-def writeRepor( jobCount=0 ):
+def writeReport( mapJobCount, reduceJobCount ):
     with (open(reportFile,'a+')) as fh:
-        fh.write(str(int(time.time())) + ',' + str(jobCount) + '\n') 
+        fh.write(str(int(time.time())) + ',' + str(mapJobCount) + "," + str(reduceJobCount) + '\n')
 
 def requestForJson():
     try:
@@ -26,16 +27,23 @@ def requestForJson():
         resp = requests.get(url)
 
     data=json.loads(resp.text)
-    
-    for scheduler,skey in data.iteritems():
+
+    mapJobCount=0
+    reduceJobCount=0
+
+    for scheduler,sdict in data.items():
         if scheduler == 'fairscheduler':
-            for pools,pkey in skey.iteritems():
+            for pools,plist in sdict.items():
                 if pools == 'pools':
-                    for jobs,jobskey in pkey:
-                        if jobs['name'] == user:
-                            for job in jobskey.iteritems():
-                                if job[0] == 'runningTasks' and job[1] > 0:
-                                    writeRepor(job[1])
+                    for jobs in plist:
+                            if jobs[0]['name'] == user: 
+                                if jobs[0]['taskType'] == 'MAP':
+                                    if jobs[1]['runningTasks'] > 0:
+                                        mapJobCount+=jobs[1]['runningTasks']
+                                if jobs[0]['taskType'] == 'REDUCE':
+                                    if jobs[1]['runningTasks'] > 0:
+                                        reduceJobCount+=jobs[1]['runningTasks']
+    writeReport(mapJobCount, reduceJobCount)
 
 def main():
     signal.signal(signal.SIGUSR1, signalHandler);
