@@ -5,7 +5,6 @@ import time
 import signal
 import sys
 
-
 url='http://example.com:50030/metrics?format=json'
 user='eselyavka'
 sleepInterval=1
@@ -23,7 +22,7 @@ def requestForJson():
     try:
         resp = requests.get(url)
     except requests.exceptions.ConnectionError:
-        time.sleep(sleepInterval)
+        time.sleep(5)
         resp = requests.get(url)
 
     data=json.loads(resp.text)

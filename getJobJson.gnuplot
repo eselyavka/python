@@ -11,4 +11,4 @@ set format x "%H:%M:%S"
 set auto x
 set key left top
 set grid
-plot "jobReport.txt" u 1:2 w lines lw 2 lt 3 ti 'map_tasks', '' u 1:3 w lines lw 2 lt 4 ti 'reduce_tasks'
+plot "jobReport.dat" u 1:2 w lines lw 2 lt 3 ti 'map_tasks', '' u 1:3 w lines lw 2 lt 4 ti 'reduce_tasks'
