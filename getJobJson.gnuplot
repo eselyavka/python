@@ -1,7 +1,12 @@
 if (!exists("username")) {
     username=system("echo $USER");
 }
-outPut = 'MapReduceSlotUtilization'.username.'Stat.png'
+
+if (!exists("inputfile")) {
+    inputfile='jobReportHourlyAgg.dat'
+}
+
+outPut = "MapReduceSlotUtilization".username."_".inputfile."Stat.png"
 set datafile separator ","
 set terminal png size 1200,800
 set output outPut
@@ -22,5 +27,5 @@ set style fill solid border -1
 set boxwidth 0.5 relative
 set style data histograms
 set style histogram rowstacked
-plot "jobReportHourlyAgg.dat" using 1:2 with boxes lc rgb "red" ti 'map', \
-     "" using 1:3 with boxes lc rgb "yellow" ti 'reduce'
+plot inputfile using 1:2 with boxes lc rgb "red" ti "map", \
+     "" using 1:3 with boxes lc rgb "yellow" ti "reduce"
