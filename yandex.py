@@ -55,10 +55,16 @@ def sqlQuery():
 
 #Task4
 def shellExample():
-    return '''awk '{print $1}' < access.log | sort | uniq -c -d  | sort -rnk1 | head -10'''
+    return '''awk '{print $1}' < access.log \
+              | sort \
+              | uniq -c -d  \
+              | sort -rnk1 \
+              | head -10'''
 
 def shellExample2():
-    return '''awk '{freq[$1]++} END {for (i in freq) {printf "%d\t%s\n", freq[i], i}}' < access.log | sort -rnk1 | head -10'''
+    return '''awk '{freq[$1]++} END {for (i in freq) {printf "%d\t%s\n", freq[i], i}}' < access.log \
+              | sort -rnk1 \
+              | head -10'''
 
 def pythonExample():
     freq = dict()
