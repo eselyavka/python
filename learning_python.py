@@ -47,6 +47,15 @@ def adder(*vargs, **kargs):
 
     return summator
 
+def countdown(counter):
+    """Self-recursive generator"""
+    if counter == 0:
+        yield 'stop'
+    else:
+        yield counter
+        for element in countdown(counter-1):
+            yield element
+
 def main():
     """Command line entry point."""
     print adder('hello', 'world', 'bbbb', 'mmm', str1='sss', str2='nnnn')
@@ -55,6 +64,9 @@ def main():
     print copy_dict({'i':45, 'f':0.95, 'mas':[1, 6, 7]})
     print add_dict({'i':40, 'f':0.95, 'mas':[1, 6, 4]},
                   {'str':'bbb', 'i':90, 'd':{'b':1, 'c':3}})
+
+    for element in countdown(5):
+        print element
 
 if __name__ == '__main__':
     main()
