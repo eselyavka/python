@@ -1,19 +1,8 @@
 import re
 
 #Task1
-inKey = ('key1','key2','key3','key4')
-inValues = ('value1','value2')
-
-def toDict(inKey, inValues):
-    outDict = dict()
-    i=0
-    for k in inKey:
-        try:
-            outDict[k] = inValues[i]
-        except IndexError:
-            outDict[k] = None
-        i+=1
-    return outDict
+def toDict(inKey=['key1','key2','key3','key4'], inValues=['value1','value2']):
+    return dict(map(None, inKey, inValues))
 
 #Task2
 def checkLoginRE(login):
