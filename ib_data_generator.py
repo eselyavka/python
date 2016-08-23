@@ -16,12 +16,14 @@ CREATE TABLE test_bin
 """
 
 import argparse
+import gc
+import logging
 import random
 import struct
 import string
 
-MEGABYTES = 1000
-BATCH_SIZE_MEGABYTES = 100
+MEGABYTES = 1
+BATCH_SIZE_MEGABYTES = 1
 DEFAULT_OUTPUT_FN = '/tmp/data.tsv'
 
 def data_constructor(is_bin, rnd):
@@ -34,40 +36,45 @@ def data_constructor(is_bin, rnd):
         Returns:
             list: list with random values
     """
+    nulls = 0b00000000
     if rnd:
         year = random.randint(2000, 2016)-1900 if is_bin else random.randint(2000, 2016)
         month = "%02d" % (random.randint(1, 12))
         day = "%02d" % (random.randint(1, 31))
-        date = int(str(year)+month+day)
+        date = int(str(year)+month+day) if is_bin else ''.join([str(year),
+                                                                '-',
+                                                                month,
+                                                                '-',
+                                                                day])
         rnd_str = ''.join([random.choice(string.ascii_uppercase +
                                          string.digits)
                            for _ in range(random.randint(1, 5))])
-        if is_bin:
-            rnd_len = len(rnd_str)
-
         values = [date,
                   random.randint(1, 100000),
                   random.randint(1, 30000),
-                  random.randint(0, 127)]
+                  random.randint(0, 127),
+                  rnd_str,
+                  random.randint(0, 10000000),
+                  random.randint(1, 100000000000),
+                  random.randint(1, 200000000000)]
         if is_bin:
-            values.append(rnd_len)
-        values.append(rnd_str)
-        values.append(random.randint(0, 10000000))
-        values.append(random.randint(1, 100000000000))
-        values.append(random.randint(1, 200000000000))
+            values.insert(4, len(values[4]))
+        if is_bin:
+            values.insert(0, nulls)
     else:
         # use constant data set
         # '2016-08-20    85175   2089    52  IH7FR   2690744 24228276039 177420773741'
         if is_bin:
-            values = [1160820,
+            values = [nulls,
+                      1160820,
                       85175,
                       2089,
                       52,
                       5,
                       'IH7FR',
                       2690744,
-                      long(24228276039),
-                      long(177420773741)]
+                      24228276039,
+                      177420773741]
         else:
             values = ['2016-08-20',
                       85175,
@@ -92,7 +99,6 @@ def data_packer(is_bin, rnd):
     """
     values = data_constructor(is_bin, rnd)
     if is_bin:
-        values.insert(0, 0b00000000)
         values.insert(0, struct.calcsize('<B I I H B H {0}s I Q Q'.format(values[5])))
         s_fmt = struct.Struct("<H B I I H B H {0}s I Q Q".format(values[6]))
         bin_data = s_fmt.pack(*tuple(values))
@@ -111,14 +117,20 @@ def data_writer(data_fn, is_bin=False, rnd=False):
             None
     """
     fh = open(data_fn, 'wb' if is_bin else 'w')
-    for _ in xrange(MEGABYTES/BATCH_SIZE_MEGABYTES):
+    for _ in range(MEGABYTES/BATCH_SIZE_MEGABYTES):
         data = [data_packer(is_bin, rnd) for _ in xrange((BATCH_SIZE_MEGABYTES<<20)/39)]
         fh.writelines(data)
+        del data
+        logging.debug('freeing memory')
+        gc.collect()
     fh.close()
 
 def process_args():
     """
     Handle command line arguments
+    parser.add_argument('--rnd',
+                        action='store_true',
+                        help='flag which invoke random library in data \
 
     Args:
         None
@@ -137,12 +149,26 @@ def process_args():
                         action='store_true',
                         help='flag which invoke random library in data \
                               file generation process')
+    parser.add_argument('--debug',
+                        action='store_true',
+                        help='debug output')
     propagator_args = parser.parse_args()
     return propagator_args
 
 def main():
     """CLI entry point."""
     cli_args = process_args()
+    logging.basicConfig(
+        format='\t'.join([
+            '%(asctime)s',
+            '%(name)s',
+            '%(levelname)s',
+            '(%(process)d)',
+            '%(message)s'
+        ]),
+        level=logging.INFO if not cli_args.debug else logging.DEBUG
+    )
+    logging.getLogger(__name__).setLevel(logging.DEBUG)
     data_writer(cli_args.output_file,
                 cli_args.binary,
                 cli_args.rnd)
