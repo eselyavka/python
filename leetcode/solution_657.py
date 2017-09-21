@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 class Solution657(object):
     def judge_circle(self, moves):
         """
