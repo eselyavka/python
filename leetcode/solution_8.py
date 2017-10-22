@@ -43,7 +43,7 @@ class Solution(object):
 
 class TestSolution(unittest.TestCase):
 
-    def test_groupAnagrams(self):
+    def test_myAtoi(self):
         digits = ["", "  -0012a42", "+", "-", "2147483648", "-2147483648"]
         solution = Solution()
         self.assertEqual(solution.myAtoi(digits[0]), 0)
