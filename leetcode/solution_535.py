@@ -18,7 +18,7 @@ class Codec(object):
     def decode(self, shortUrl):
         return self._map[shortUrl.split('/')[-1]]
 
-class TestSolution(unittest.TestCase):
+class TestCodec(unittest.TestCase):
 
     def test_encode_decode(self):
         longUrl = 'https://leetcode.com/problems/design-tinyurl'
