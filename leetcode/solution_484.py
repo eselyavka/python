@@ -28,7 +28,7 @@ class Solution(object):
 
 class TestSolution(unittest.TestCase):
 
-    def test_reverse(self):
+    def test_findPermutation(self):
         solution = Solution()
         self.assertEqual(solution.findPermutation('I'), [1, 2])
         self.assertEqual(solution.findPermutation('III'), [1, 2, 3, 4])
