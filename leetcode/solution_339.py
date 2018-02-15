@@ -3,15 +3,20 @@
 class Solution(object):
 
     @staticmethod
-    def _rec(nl, depth=1):
+    def _rec(nestedList, depth=1):
         res = 0
 
-        for e in nl:
-            if not isinstance(e, list) and e.isInteger():
-                res += depth * e.getInteger()
-            else:
-                res = res + Solution._rec(e, depth=depth+1)
+        if not nestedList:
+            return 0
 
+        for element in nestedList:
+            if isinstance(element, NestedInteger):
+                if element.isInteger():
+                    res += depth * element.getInteger()
+                else:
+                    res = res + Solution._rec(element.getList(), depth=depth+1)
+            else:
+                res = res + Solution._rec(nestedList[1:])
         return res
 
     def depthSum(self, nestedList):
