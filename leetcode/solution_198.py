@@ -2,7 +2,24 @@
 
 import unittest
 
+def _rec(nums, n):
+    if n < len(nums):
+        return max(nums[n] + _rec(nums, n+2), _rec(nums, n+1))
+    return 0
+
 class Solution(object):
+    def rob_rec(self, nums):
+        if not nums:
+            return 0
+
+        if len(nums) == 1:
+            return nums[0]
+
+        if len(nums) == 2:
+            return max(nums)
+
+        return max(_rec(nums, 0), _rec(nums, 1))
+
     def rob(self, nums):
         """
         :type nums: List[int]
@@ -29,12 +46,20 @@ class TestSolution(unittest.TestCase):
 
     def test_matrixReshape(self):
         solution = Solution()
+
         self.assertEqual(solution.rob(self.arr1), 27)
         self.assertEqual(solution.rob(self.arr2), 409)
         self.assertEqual(solution.rob(self.arr3), 6)
         self.assertEqual(solution.rob(self.arr4), 2)
         self.assertEqual(solution.rob(self.arr5), 3)
         self.assertEqual(solution.rob(self.arr6), 4)
+
+        self.assertEqual(solution.rob_rec(self.arr1), 27)
+        self.assertEqual(solution.rob_rec(self.arr2), 409)
+        self.assertEqual(solution.rob_rec(self.arr3), 6)
+        self.assertEqual(solution.rob_rec(self.arr4), 2)
+        self.assertEqual(solution.rob_rec(self.arr5), 3)
+        self.assertEqual(solution.rob_rec(self.arr6), 4)
 
 if __name__ == '__main__':
     unittest.main()
