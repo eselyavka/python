@@ -15,9 +15,30 @@ class Solution(object):
         :type num: int
         :rtype: str
         """
-        mas = list()
-        res = self._rec(num, mas) * -1 if num < 0 else self._rec(num, mas)
-        return str(res)
+        #mas = list()
+        #res = self._rec(num, mas) * -1 if num < 0 else self._rec(num, mas)
+
+        return self.convertToAnyBase(num, 7)
+
+    def convertToAnyBase(self, num, base):
+        if num == 0:
+            return str(num)
+
+        digits = '0123456789ABCDEF'
+        stack = []
+
+        res = '-' if num < 0 else ''
+        num = abs(num)
+
+        while num > 0:
+            rem = num % base
+            stack.append(rem)
+            num = num // base
+
+        while stack:
+            res += digits[stack.pop()]
+
+        return res
 
 class TestSolution(unittest.TestCase):
 
@@ -27,6 +48,10 @@ class TestSolution(unittest.TestCase):
         self.assertEqual(solution.convertToBase7(nums[0]), "202")
         self.assertEqual(solution.convertToBase7(nums[1]), "-10")
         self.assertEqual(solution.convertToBase7(nums[2]), "0")
+
+        self.assertEqual(solution.convertToAnyBase(nums[0], 7), "202")
+        self.assertEqual(solution.convertToAnyBase(nums[1], 7), "-10")
+        self.assertEqual(solution.convertToAnyBase(nums[2], 7), "0")
 
 if __name__ == '__main__':
     unittest.main()
