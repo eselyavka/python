@@ -2,41 +2,45 @@
 
 import unittest
 
+class ListNode(object):
+    def __init__(self, x):
+        self.val = x
+        self.next = None
+
 class Solution(object):
-    def letterCasePermutation(self, S):
+    def reverseList(self, head):
         """
-        :type S: str
-        :rtype: List[str]
+        :type head: ListNode
+        :rtype: ListNode
         """
-        res = []
-        for i in range(1 << len([c for c in S if not c.isdigit()])):
-            s1 = []
-            k = 0
-            for c in S:
-                if c.isdigit():
-                    s1.append(c)
-                    continue
-                else:
-                    if (i >> k) & 1:
-                        s1.append(c.lower())
-                    else:
-                        s1.append(c.upper())
-                    k += 1
-            res.append(''.join(s1))
-        return res if res else ['']
+        if not head:
+            return
+
+        stack = []
+        while head:
+            stack.append(head.val)
+            head = head.next
+
+        rev = ListNode(stack.pop())
+        buf = rev
+
+        while stack:
+            node = ListNode(stack.pop())
+            buf.next = node
+            buf = node
+
+        return rev
 
 class TestSolution(unittest.TestCase):
 
-    def test_letterCasePermutation(self):
+    def test_reverseList(self):
         solution = Solution()
-        self.assertEqual(solution.letterCasePermutation('12345'), ['12345'])
-        self.assertEqual(solution.letterCasePermutation('ab'), ['AB', 'aB', 'Ab', 'ab'])
-        self.assertEqual(solution.letterCasePermutation('a1b2'), ['A1B2',
-                                                                  'a1B2',
-                                                                  'A1b2',
-                                                                  'a1b2'])
-        self.assertEqual(solution.letterCasePermutation(''), [''])
-        self.assertEqual(solution.letterCasePermutation('C'), ['C', 'c'])
+        head = ListNode(1)
+        head.next = ListNode(2)
+        head.next.next = ListNode(3)
+        head2 = ListNode(10)
+        self.assertTrue(isinstance(solution.reverseList(head), ListNode))
+        self.assertTrue(isinstance(solution.reverseList(head2), ListNode))
 
 if __name__ == '__main__':
     unittest.main()
