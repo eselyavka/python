@@ -1,3 +1,3 @@
 python
 ======
-My python scripts
+*My python scripts*
