@@ -2,12 +2,12 @@
 
 import unittest
 
-def _rec(nums, n):
-    if n < len(nums):
-        return max(nums[n] + _rec(nums, n+2), _rec(nums, n+1))
-    return 0
-
 class Solution(object):
+    def _rec(self, nums, n):
+        if n < len(nums):
+            return max(nums[n] + self._rec(nums, n+2), self._rec(nums, n+1))
+        return 0
+
     def rob_rec(self, nums):
         if not nums:
             return 0
@@ -18,21 +18,19 @@ class Solution(object):
         if len(nums) == 2:
             return max(nums)
 
-        return max(_rec(nums, 0), _rec(nums, 1))
+        return max(self._rec(nums, 0), self._rec(nums, 1))
 
     def rob(self, nums):
         """
         :type nums: List[int]
         :rtype: int
         """
-        excl = 0
-        incl = 0
-        for i in nums:
-            new_excl = max(excl, incl)
-            incl = excl + i
-            excl = new_excl
+        prevMax = currMax = 0
 
-        return max(excl, incl)
+        for num in nums:
+            currMax, prevMax = max(prevMax + num, currMax), currMax
+
+        return currMax
 
 class TestSolution(unittest.TestCase):
 
