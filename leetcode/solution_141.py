@@ -8,27 +8,24 @@ class ListNode(object):
         self.next = None
 
 class Solution(object):
-    def isPalindrome(self, head):
+    def hasCycle(self, head):
         """
         :type head: ListNode
         :rtype: bool
         """
 
-        stack = []
-        buf = head
-        while buf is not None:
-            stack.append(buf.val)
-            buf = buf.next
-
+        s = set()
         while head is not None:
-            if head.val != stack.pop():
-                return False
+            if id(head) in s:
+                return True
+
+            s.add(id(head))
             head = head.next
 
-        return True
+        return False
 
 class TestSolution(unittest.TestCase):
-    def test_isPalindrome(self):
+    def test_hasCycle(self):
         lst_one = ListNode(10)
 
         lst = ListNode(1)
@@ -44,13 +41,14 @@ class TestSolution(unittest.TestCase):
         lst3.next.next = ListNode(3)
         lst3.next.next.next = ListNode(2)
         lst3.next.next.next.next = ListNode(1)
+        lst3.next.next.next.next.next = lst3.next.next
 
         solution = Solution()
-        self.assertTrue(solution.isPalindrome(None))
-        self.assertTrue(solution.isPalindrome(lst_one))
-        self.assertFalse(solution.isPalindrome(lst))
-        self.assertTrue(solution.isPalindrome(lst2))
-        self.assertTrue(solution.isPalindrome(lst3))
+        self.assertFalse(solution.hasCycle(None))
+        self.assertFalse(solution.hasCycle(lst_one))
+        self.assertFalse(solution.hasCycle(lst))
+        self.assertFalse(solution.hasCycle(lst2))
+        self.assertTrue(solution.hasCycle(lst3))
 
 if __name__ == '__main__':
     unittest.main()
