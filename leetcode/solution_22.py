@@ -9,16 +9,16 @@ class Solution(object):
         :rtype: List[str]
         """
         mas = []
-        def backtrack(s='', l=0, r=0, i=0):
+        def backtrack(s='', l=0, r=0):
             if len(s) == 2 * n:
                 mas.append(s)
                 return
 
             if l < n:
-                backtrack(s+'(', l+1, r, i+1)
+                backtrack(s+'(', l+1, r)
 
             if r < l:
-                backtrack(s+')', l, r+1, i+1)
+                backtrack(s+')', l, r+1)
 
         backtrack()
         return mas
