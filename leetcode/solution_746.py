@@ -3,11 +3,6 @@
 import unittest
 
 class Solution(object):
-    def _rec(self, nums, i):
-        if i < len(nums):
-            return nums[i] + min(self._rec(nums, i+1), self._rec(nums, i+2))
-        return 0
-
     def minCostClimbingStairs(self, nums):
         """
         :type nums: List[int]
