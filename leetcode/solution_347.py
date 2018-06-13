@@ -32,8 +32,6 @@ class TestSolution(unittest.TestCase):
 
         arr = [4, 5, 1, 1, 1, 2, 2, 3]
 
-        solution.topKFrequent(arr, 2)
-
         self.assertEqual(solution.topKFrequent(arr, 2),
                          [1, 2])
 
