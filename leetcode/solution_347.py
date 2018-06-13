@@ -2,6 +2,7 @@
 
 import unittest
 from collections import defaultdict
+import heapq
 
 class Solution(object):
     def topKFrequent(self, nums, k):
@@ -14,7 +15,12 @@ class Solution(object):
 
         for num in nums:
             d[num] += 1
+
         res = d.items()
+
+        if 'heapq' in globals():
+            return [x[0] for x in heapq.nlargest(k, res, key=lambda x: x[1])]
+
         res.sort(key=lambda x: x[1])
         return [x[0] for x in res[:-(k+1):-1]]
 
