@@ -3,12 +3,6 @@
 import unittest
 from collections import defaultdict
 
-class Bucket(object):
-    def __init__(self, cnt):
-        self.cnt = cnt
-        self.prev = self._next = None
-        self.skey = set()
-
 class AllOne(object):
 
     def __init__(self):
