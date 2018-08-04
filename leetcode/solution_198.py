@@ -25,12 +25,22 @@ class Solution(object):
         :type nums: List[int]
         :rtype: int
         """
-        prevMax = currMax = 0
+        if not nums:
+            return 0
 
-        for num in nums:
-            currMax, prevMax = max(prevMax + num, currMax), currMax
+        size = len(nums)
 
-        return currMax
+        if size in [1, 2]:
+            return max(nums)
+
+        dp = [0] * size
+        res = 0
+
+        for i in range(size):
+            res = max(nums[i] + (dp[i-2] if i >= 2 else 0), (dp[i-1] if i >= 1 else 0))
+            dp[i] = res
+
+        return res
 
 class TestSolution(unittest.TestCase):
 
@@ -42,7 +52,7 @@ class TestSolution(unittest.TestCase):
         self.arr5 = [1, 3, 1]
         self.arr6 = [2, 1, 1, 2]
 
-    def test_matrixReshape(self):
+    def test_rob(self):
         solution = Solution()
 
         self.assertEqual(solution.rob(self.arr1), 27)
