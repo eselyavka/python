@@ -23,7 +23,7 @@ class Solution(object):
 
         while True:
             if not curr and stack:
-                node=stack.pop()
+                node = stack.pop()
                 res.append(node.val)
                 curr = node.right
             else:
