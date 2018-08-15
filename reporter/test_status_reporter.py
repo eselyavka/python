@@ -20,6 +20,11 @@ class TestRate(unittest.TestCase):
 
         self.assertEqual(srv_rate.rate(), float(7) / float(15))
 
+    def test_server_rate_calculation_with_zero_success(self):
+        srv_rate = SrvRate(0, 4)
+
+        self.assertEqual(srv_rate.rate(), float(0))
+
 
 class TestReport(unittest.TestCase):
     def setUp(self):
@@ -30,7 +35,7 @@ class TestReport(unittest.TestCase):
         self.assertEqual(id(self.report), id(another_report))
 
     def test_report_store(self):
-        apps = ['app1', 'app2']
+        apps = ['app1', 'app2', 'app_zero']
         versions = ['1.0.0', '1.0.1']
 
         self.report.add(apps[0], versions[0], 10, 3)
@@ -39,14 +44,17 @@ class TestReport(unittest.TestCase):
         self.report.add(apps[1], versions[0], 10, 3)
         self.report.add(apps[1], versions[1], 100, 3)
         self.report.add(apps[1], versions[1], 14, 3)
+        self.report.add(apps[2], versions[0], 0, 3)
 
         report_store = self.report.get_raw_storage()
         self.assertListEqual(sorted(report_store.keys()), sorted(apps))
         self.assertListEqual(report_store[apps[0]].keys(), [versions[0]])
+        self.assertListEqual(report_store[apps[2]].keys(), [versions[0]])
         self.assertListEqual(report_store[apps[1]].keys(), versions)
         self.assertEqual(report_store[apps[0]][versions[0]].rate(), 0.3)
         self.assertEqual(report_store[apps[1]][versions[0]].rate(), 0.3)
         self.assertEqual(report_store[apps[1]][versions[1]].rate(), float(6) / float(114))
+        self.assertEqual(report_store[apps[2]][versions[0]].rate(), 0.0)
 
 
 class TestStatusReport(unittest.TestCase):
