@@ -4,6 +4,9 @@ class SrvRate(object):
         self.succ = succ
 
     def rate(self):
+        if not self.total:
+            return 0.0
+
         return float(self.succ) / float(self.total)
 
     def add_total(self, num):

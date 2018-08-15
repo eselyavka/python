@@ -1,5 +1,4 @@
-# Byte-compiled / optimized / DLL files
-__pycache__/
+# Byte-compiled / optimized / DLL files __pycache__/
 *.py[cod]
 
 # C extensions
@@ -53,3 +52,4 @@ coverage.xml
 docs/_build/
 
 **/.idea
+**/.DS_Store
