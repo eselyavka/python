@@ -46,9 +46,9 @@ def process_request(req):
     try:
         data = req.json()
         if ('Application' not in data or
-                    'Version' not in data or
-                    'Request_Count' not in data or
-                    'Success_Count' not in data):
+                'Version' not in data or
+                'Request_Count' not in data or
+                'Success_Count' not in data):
             raise StandardError("Invalid json format")
 
         REPORT.add(data['Application'],
@@ -69,7 +69,6 @@ def request_server(method,
                    allow_redirects=False,
                    timeout=60,
                    **kwargs):
-
     LOG.debug('Requesting server: (%s) %s.', method, req_url)
 
     try:
@@ -112,7 +111,7 @@ def requester(server_list):
 
 def executor(arr):
     tasks = []
-    for i in range(NUM_THREADS):
+    for i in range(len(arr)):
         task = threading.Thread(target=requester, args=(arr[i],))
         tasks.append(task)
         task.start()
@@ -144,6 +143,9 @@ def read_and_split(input):
         return []
 
     batch_size = len(requires_processing) // NUM_THREADS
+
+    if not batch_size:
+        return [requires_processing]
 
     i = 0
     work_set = []
