@@ -133,18 +133,21 @@ class TestStatusReport(unittest.TestCase):
         return split_servers
 
     def test_read_and_split_should_return_list_when_input(self):
+        app_srvs = ['app{}\n'.format(x) for x in range(1, 3)]
+        self.assertListEqual(TestStatusReport.read_input_srv_list(app_srvs), [[srv.strip() for srv in app_srvs]])
+
         app_srvs = ['app{}\n'.format(x) for x in range(1, 6)]
         self.assertListEqual(TestStatusReport.read_input_srv_list(app_srvs),
                              [[srv.strip()] for srv in app_srvs])
 
         app_srvs = ['app{}\n'.format(x) for x in range(1, 7)]
-        self.assertTrue([len(x) in [1, 2] for x in TestStatusReport.read_input_srv_list(app_srvs)])
+        self.assertTrue(all([len(x) in [1, 2] for x in TestStatusReport.read_input_srv_list(app_srvs)]))
 
         app_srvs = ['app{}\n'.format(x) for x in range(1, 1001)]
         self.assertTrue(all([len(x) == 200 for x in TestStatusReport.read_input_srv_list(app_srvs)]))
 
         app_srvs = ['app{}\n'.format(x) for x in range(1, 1029)]
-        self.assertTrue([len(x) in [205, 208] for x in TestStatusReport.read_input_srv_list(app_srvs)])
+        self.assertTrue(all([len(x) in [205, 208] for x in TestStatusReport.read_input_srv_list(app_srvs)]))
 
 
 if __name__ == '__main__':
