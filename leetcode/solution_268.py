@@ -8,18 +8,19 @@ class Solution(object):
         :type nums: List[int]
         :rtype: int
         """
-        if len(nums) == 1:
-            return nums[0]+1 if nums[0] == 0 else nums[0]-1
-
-        i = 1
         nums.sort()
 
+        if nums[0] != 0:
+            return 0
+
+        if nums[-1] != len(nums):
+            return len(nums)
+
+        i = 0
         while i < len(nums):
             if nums[i] - nums[i-1] > 1:
                 return nums[i] - 1
             i += 1
-
-        return nums[len(nums)-1] + 1 if nums[0] == 0 else 0
 
 class TestSolution(unittest.TestCase):
     def test_missingNumber(self):
