@@ -31,7 +31,8 @@ class Report(object):
         for app in self._store:
             report += "Application '{}'\n".format(app)
             for ver in self._store[app]:
-                report += "\t\tVersion='{ver}', success rate is '{rate:.4f}'\n".format(ver=ver,
-                                                                                     rate=self._store[app][ver].rate())
+                report += "\t\tVersion='{ver}', success rate is '{rate:.4f}'\n".format(
+                    ver=ver,
+                    rate=self._store[app][ver].rate())
             report += '\n\n'
         return report
