@@ -13,7 +13,7 @@ from status_reporter.report import Report
 NUM_THREADS = 5
 LOG = logging.getLogger(__name__)
 REPORT = Report()
-SRV_TEMPLATE_URL = 'http://{server_name}.twitter.com/status'
+SRV_TEMPLATE_URL = 'http://{server_name}/status'
 NEED_ATTENTION_SRV = set()
 
 
@@ -156,6 +156,8 @@ def read_and_split(input):
         else:
             work_set.append(requires_processing[i * batch_size: (i + 1) * batch_size])
         i += 1
+
+    LOG.debug("Working set={}".format(work_set))
 
     return work_set
 
