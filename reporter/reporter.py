@@ -2,10 +2,11 @@
 
 import argparse
 import logging
-import os
 import sys
 import threading
+import time
 
+import os
 import requests
 
 from status_reporter.report import Report
@@ -15,6 +16,7 @@ LOG = logging.getLogger(__name__)
 REPORT = Report()
 SRV_TEMPLATE_URL = 'http://{server_name}/status'
 NEED_ATTENTION_SRV = set()
+RETRY_TIMEOUT_SEC = 10
 
 
 def process_args():
@@ -105,6 +107,14 @@ def requester(server_list):
             res = process_request(req)
             if not res:
                 NEED_ATTENTION_SRV.add(srv)
+            else:
+                if NEED_ATTENTION_SRV:
+                    try:
+                        NEED_ATTENTION_SRV.remove(srv)
+                        LOG.debug('Removing server from NEED_ATTENTION_LIST, (%s)', srv)
+                    except KeyError:
+                        LOG.debug('Server (%s) not in NEED_ATTENTION_LIST')
+
         else:
             NEED_ATTENTION_SRV.add(srv)
 
@@ -162,6 +172,19 @@ def read_and_split(input):
     return work_set
 
 
+def retry(_power, _max_timeout_sec):
+    _sleep_sec = 2 ** _power
+    if _sleep_sec > _max_timeout_sec or not NEED_ATTENTION_SRV:
+        LOG.warning(
+            "Those are the list of servers which requires maintenance=({})".format(','.join(NEED_ATTENTION_SRV)))
+        return
+
+    LOG.info("Retrying for those list of servers=%s with sleep timeout sec=%s", NEED_ATTENTION_SRV, _sleep_sec)
+    requester(NEED_ATTENTION_SRV)
+    time.sleep(_sleep_sec)
+    retry(_power + 1, _max_timeout_sec)
+
+
 def main(cli_args):
     logging_format = '\t'.join(
         ['%(asctime)s', '%(name)s', '%(levelname)s',
@@ -178,8 +201,7 @@ def main(cli_args):
         executor(work_set)
 
     if NEED_ATTENTION_SRV:
-        LOG.warning(
-            "Those are the list of servers which requires maintenance=({})".format(','.join(NEED_ATTENTION_SRV)))
+        retry(0, RETRY_TIMEOUT_SEC)
 
     report(cli_args.output)
 
