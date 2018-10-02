@@ -1,46 +1,35 @@
 #!/usr/bin/env python
 
 import unittest
-import itertools
 
 class Solution(object):
-    def boldWords(self, words, S):
+    def isOneBitCharacter(self, bits):
         """
-        :type words: List[str]
-        :type S: str
-        :rtype: str
+        :type bits: List[int]
+        :rtype: bool
         """
-        if not S:
-            return S
+        if len(bits) == 1:
+            return bits[0] == 0
 
-        bit_mask = [0 for _ in range(len(S))]
-        i = 0
-        for i in xrange(len(S)):
-            prefix = S[i:]
-            for word in words:
-                if prefix.startswith(word):
-                    for j in xrange(i, min(i + len(word), len(S))):
-                        bit_mask[j] = 1
-        res = []
+        start, i = 0, 0
 
-        for incl, grp in itertools.groupby(zip(S, bit_mask), lambda z: z[1]):
-            if incl: res.append("<b>")
-            res.append("".join(z[0] for z in grp))
-            if incl: res.append("</b>")
+        while i < len(bits):
+            start = i
+            if bits[i] != 0:
+                i += 2
+            else:
+                i += 1
 
-        return "".join(res)
+        return start == len(bits) - 1
 
 class TestSolution(unittest.TestCase):
 
-    def test_boldWords(self):
+    def test_isOneBitCharacter(self):
         solution = Solution()
 
-        self.assertEqual(solution.boldWords(["ab", "bc"], "aabcd"), "a<b>abc</b>d")
-        self.assertEqual(solution.boldWords(["ab", "bcd"], "aabcd"), "a<b>abcd</b>")
-        self.assertEqual(solution.boldWords(["a", "bcd"], "a"), "<b>a</b>")
-        self.assertEqual(solution.boldWords(["a", "bcd"], ""), "")
-        self.assertEqual(solution.boldWords(["ac", "bcd"], "ac"), "<b>ac</b>")
-        self.assertEqual(solution.boldWords([""], "ac"), "ac")
+        self.assertTrue(solution.isOneBitCharacter([1, 0, 0]))
+        self.assertFalse(solution.isOneBitCharacter([1, 1, 1, 0]))
+        self.assertTrue(solution.isOneBitCharacter([0, 0]))
 
 if __name__ == '__main__':
     unittest.main()
