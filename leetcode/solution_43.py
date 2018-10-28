@@ -9,20 +9,16 @@ class Solution(object):
         :type num2: str
         :rtype: str
         """
+        res = [0] * (len(num1) + len(num2))
+        for i in reversed(range(len(num1))):
+            for j in reversed(range(len(num2))):
+                res[i+j+1] += int(num1[i]) * int(num2[j])
+                res[i+j] += res[i+j+1] // 10
+                res[i+j+1] %= 10
 
-        res, rank1 = 0, 10 ** (len(num1) - 1)
+        res = res[next((i for i, x in enumerate(res) if x != 0), len(res)):]
 
-        for c1 in num1:
-            acc, rank2 = 0, 10 ** (len(num2) - 1)
-            for c2 in num2:
-                acc += (int(c1) * rank1) * (int(c2) * rank2)
-                rank2 = rank2 // 10
-
-            rank1 = rank1 // 10
-
-            res += acc
-
-        return str(res)
+        return ''.join([str(x) for x in res])
 
 class TestSolution(unittest.TestCase):
 
