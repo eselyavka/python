@@ -1,30 +1,35 @@
 #!/usr/bin/env python2.7
 
-def lre(_str):
-    if not _str:
+def lre(str_):
+    if not str_:
         return ''
 
-    if len(_str) == 1:
-        return _str
+    if len(str_) == 1:
+        return str_
 
-    _prev, res = None, ''
-    cnt = 1
+    prev, res, cnt = None, '', 1
 
-    for i, c in enumerate(_str):
-        if c == _prev:
+    for i, c in enumerate(str_):
+        if c == prev:
             cnt += 1
         else:
-            res += (_prev if _prev else '') + (str(cnt) if cnt > 1 else '')
+            res += (prev if prev else '') + (str(cnt) if cnt > 1 else '')
             cnt = 1
 
-        if i == len(_str) - 1:
+        if i == len(str_) - 1:
             res += c + (str(cnt) if cnt > 1 else '')
 
-        _prev = c
+        prev = c
 
     return res
 
 def main():
+    payload = None
+    assert lre(payload) == ''
+
+    payload = 'c'
+    assert lre(payload) == 'c'
+
     payload = 'aaaabbcdrtty'
     assert lre(payload) == 'a4b2cdrt2y'
 
@@ -36,6 +41,9 @@ def main():
 
     payload = 'abcd'
     assert lre(payload) == 'abcd'
+
+    payload = 'abcdddddd'
+    assert lre(payload) == 'abcd6'
 
 if __name__ == '__main__':
     main()
