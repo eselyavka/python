@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+
 class Solution(object):
 
     @staticmethod
@@ -38,6 +39,7 @@ class Solution(object):
         height = Solution.heigh(nestedList)
 
         return Solution._rec(nestedList, height)
+
 
 class SolutionArr(object):
 
@@ -79,9 +81,49 @@ class SolutionArr(object):
 
         return SolutionArr._rec(nestedList, height)
 
+
+class SolutionDict(object):
+    def height(self, nestedList):
+        for element in nestedList:
+            if isinstance(element, int):
+                continue
+            return 1 + self.height(element)
+
+        return 1
+
+    def depthSumInverse(self, nestedList):
+        """
+        :type nestedList: List[NestedInteger]
+        :rtype: int
+        """
+        height = self.height(nestedList)
+        mem = {i: 0 for i in range(1, height + 1)}
+
+        def rec(lst, level):
+            if level == 0:
+                return
+            for element in lst:
+                if isinstance(element, int):
+                    mem[level] += (element * level)
+                    continue
+                rec(element, level - 1)
+
+        rec(nestedList, height)
+
+        return sum(mem.values())
+
+
 if __name__ == '__main__':
     NESTED_LIST = [[[[55]]], [[31]], [99], [], 75]
     SOLUTION_ARR = SolutionArr()
 
+    assert SOLUTION_ARR.depthSumInverse([1, [4, [6]]]) == 17
+    assert SOLUTION_ARR.depthSumInverse([[1, 1], 2, [1, 1]]) == 8
     assert SOLUTION_ARR.depthSumInverse(NESTED_LIST) == 714
     assert SOLUTION_ARR.depthSumInverse([[[-1]], [-1]]) == -3
+
+    SOLUTION_DICT = SolutionDict()
+    assert SOLUTION_DICT.depthSumInverse([1, [4, [6]]]) == 17
+    assert SOLUTION_DICT.depthSumInverse([[1, 1], 2, [1, 1]]) == 8
+    assert SOLUTION_DICT.depthSumInverse(NESTED_LIST) == 714
+    assert SOLUTION_DICT.depthSumInverse([[[-1]], [-1]]) == -3
