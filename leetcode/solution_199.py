@@ -23,22 +23,18 @@ class Solution(object):
 
         while s:
             res.append(s[-1].val)
-            level = []
-            while s:
+            k = len(s)
+            for _ in range(k):
                 node = s.pop(0)
                 if node.left:
-                    level.append(node.left)
+                    s.append(node.left)
                 if node.right:
-                    level.append(node.right)
-
-            if level:
-                s.extend(level)
+                    s.append(node.right)
 
         return res
 
 
 class TestSolution(unittest.TestCase):
-
     def test_rightSideView(self):
         root = TreeNode(1)
         root.left = TreeNode(2)
