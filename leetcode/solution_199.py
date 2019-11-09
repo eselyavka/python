@@ -2,6 +2,7 @@
 
 import unittest
 
+
 class TreeNode(object):
     def __init__(self, val):
         self.val = val
@@ -17,22 +18,23 @@ class Solution(object):
         """
         if not root:
             return root
-        s = [root]
-        res = []
+
+        s, res = [root], []
+
         while s:
-            test = []
+            res.append(s[-1].val)
+            level = []
             while s:
-                node=s.pop(0)
-                print node.val
+                node = s.pop(0)
                 if node.left:
-                    test.append(node.left)
+                    level.append(node.left)
                 if node.right:
-                    test.append(node.right)
-            if test:
-                res.append(test[-1].val)
-            #print [x.val for x in test]
-            s.extend(test)
-        return [root.val] + res
+                    level.append(node.right)
+
+            if level:
+                s.extend(level)
+
+        return res
 
 
 class TestSolution(unittest.TestCase):
@@ -47,6 +49,7 @@ class TestSolution(unittest.TestCase):
         solution = Solution()
 
         self.assertListEqual(solution.rightSideView(root), [1, 3, 4])
+
 
 if __name__ == '__main__':
     unittest.main()
