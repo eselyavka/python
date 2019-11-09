@@ -2,41 +2,39 @@
 
 import unittest
 
+
 class TreeNode(object):
     def __init__(self, val):
         self.val = val
         self.left = None
         self.right = None
 
-class Solution(object):
-    def populateArray(self, root, arr):
-        if root:
-            self.populateArray(root.left, arr)
-            arr.append(root.val)
-            self.populateArray(root.right, arr)
 
+class Solution(object):
     def findTarget(self, root, k):
         """
         :type root: TreeNode
         :type k: int
         :rtype: bool
         """
+        if not root:
+            return False
 
-        arr = list()
-        self.populateArray(root, arr)
+        mem = set()
+        s = [root]
 
-        left = 0
-        right = len(arr) - 1
-
-        while left < right:
-            if arr[left] + arr[right] == k:
+        while s:
+            node = s.pop()
+            if k - node.val in mem:
                 return True
-            elif arr[left] + arr[right] > k:
-                right -= 1
-            else:
-                left += 1
+            mem.add(node.val)
+            if node.left:
+                s.append(node.left)
+            if node.right:
+                s.append(node.right)
 
         return False
+
 
 class TestSolution(unittest.TestCase):
 
@@ -65,6 +63,7 @@ class TestSolution(unittest.TestCase):
         self.assertTrue(solution.findTarget(root2, 3))
         self.assertTrue(solution.findTarget(root3, -1))
         self.assertFalse(solution.findTarget(root, 28))
+
 
 if __name__ == '__main__':
     unittest.main()
