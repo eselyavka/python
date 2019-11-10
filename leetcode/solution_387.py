@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
-from collections import Counter
 import unittest
+from collections import defaultdict
+from string import ascii_lowercase
 
 
 class Solution(object):
@@ -10,33 +11,20 @@ class Solution(object):
         :type s: str
         :rtype: int
         """
-        if not s:
-            return -1
+        n = len(s)
+        freq = defaultdict(int)
+        idx = defaultdict(int)
+        for i in range(n):
+            freq[s[i]] += 1
+            idx[s[i]] = i
 
-        d = {}
+        ans = n
 
-        for i, c in enumerate(s):
-            if c in d:
-                d[c] = float('inf')
-            else:
-                d[c] = i
+        for c in ascii_lowercase:
+            if freq.get(c) == 1:
+                ans = min(ans, idx.get(c, n))
 
-        res = sorted(d.values())[0] if sorted(d.values())[0] != float('inf') else -1
-
-        return res
-
-    def firstUniqChar2(self, s):
-        """
-        :type s: str
-        :rtype: int
-        """
-        cnt = Counter(s)
-
-        for i in range(len(s)):
-            if cnt[s[i]] == 1:
-                return i
-
-        return -1
+        return -1 if ans == n else ans
 
 
 class TestSolution(unittest.TestCase):
@@ -49,10 +37,6 @@ class TestSolution(unittest.TestCase):
         self.assertEqual(solution.firstUniqChar(s1), 0)
         self.assertEqual(solution.firstUniqChar(s2), 2)
         self.assertEqual(solution.firstUniqChar(s3), -1)
-
-        self.assertEqual(solution.firstUniqChar2(s1), 0)
-        self.assertEqual(solution.firstUniqChar2(s2), 2)
-        self.assertEqual(solution.firstUniqChar2(s3), -1)
 
 
 if __name__ == '__main__':
