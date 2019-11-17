@@ -2,6 +2,7 @@
 
 import unittest
 
+
 class Solution(object):
     def numWays(self, n, k):
         """
@@ -9,22 +10,19 @@ class Solution(object):
         :type k: int
         :rtype: int
         """
-        if not n:
-            return 0
 
-        if n == 1:
-            return k
+        dp = [0, k, k**2, 0]
 
-        dp = [0] * n
-        dp[0] = k
+        if n <= 2:
+            return dp[n]
 
-        same, diff = 0, k
-        for i in range(1, n):
-            same = diff
-            diff = dp[i-1] * (k-1)
-            dp[i] = same + diff
+        for _ in range(2, n):
+            dp[3] = (k-1) * (dp[1] + dp[2])
+            dp[1] = dp[2]
+            dp[2] = dp[3]
 
-        return dp[n-1]
+        return dp[3]
+
 
 class TestSolution(unittest.TestCase):
     def test_numWays(self):
@@ -32,6 +30,7 @@ class TestSolution(unittest.TestCase):
         self.assertEqual(solution.numWays(3, 2), 6)
         self.assertEqual(solution.numWays(2, 4), 16)
         self.assertEqual(solution.numWays(0, 0), 0)
+
 
 if __name__ == '__main__':
     unittest.main()
