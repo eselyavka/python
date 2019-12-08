@@ -2,22 +2,23 @@
 
 import unittest
 
+
 class Solution(object):
     def isToeplitzMatrix(self, matrix):
         """
         :type matrix: List[List[int]]
         :rtype: bool
         """
-        def is_equal(i, j):
-            if i > 0 and j > 0:
-                return matrix[i][j] == matrix[i-1][j-1]
-            return True
+        n = len(matrix)
+        m = len(matrix[0])
 
-        for i in range(len(matrix)):
-            for j in range(len(matrix[i])):
-                if not is_equal(i, j):
-                    return False
+        for i in range(n):
+            for j in range(m):
+                if i < n - 1 and j < m - 1:
+                    if matrix[i][j] != matrix[i+1][j+1]:
+                        return False
         return True
+
 
 class TestSolution(unittest.TestCase):
 
@@ -28,6 +29,7 @@ class TestSolution(unittest.TestCase):
                                                    [5, 1, 2, 3],
                                                    [9, 5, 1, 2]]))
         self.assertFalse(solution.isToeplitzMatrix([[1, 2], [2, 2]]))
+
 
 if __name__ == '__main__':
     unittest.main()
