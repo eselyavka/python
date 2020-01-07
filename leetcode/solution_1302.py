@@ -32,6 +32,27 @@ class Solution(object):
 
         return d[max(d.keys())]
 
+    def deepestLeavesSumIterative(self, root):
+        """
+        :type root: TreeNode
+        :rtype: int
+        """
+        queue = [root]
+        sum_ = 0
+        while queue:
+            count = len(queue)
+            sum_ = 0
+            while count:
+                node = queue.pop(0)
+                sum_ += node.val
+                if node.left:
+                    queue.append(node.left)
+                if node.right:
+                    queue.append(node.right)
+                count -= 1
+
+        return sum_
+
 
 class TestSolution(unittest.TestCase):
     def test_deepestLeavesSum(self):
@@ -46,6 +67,7 @@ class TestSolution(unittest.TestCase):
         root.left.left.left = TreeNode(7)
 
         self.assertEqual(solution.deepestLeavesSum(root), 15)
+        self.assertEqual(solution.deepestLeavesSumIterative(root), 15)
 
 
 if __name__ == '__main__':
