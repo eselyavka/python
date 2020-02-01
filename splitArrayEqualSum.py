@@ -24,6 +24,10 @@ class TestSolution(unittest.TestCase):
 
         actual = solution.splitArrayEqualSum([1, 2, 3, 4, 5, 5])
         self.assertListEqual(actual, [[1, 2, 3, 4], [5, 5]])
+        self.assertListEqual(solution.splitArrayEqualSum([1, 1, 1, 1]), [[1, 1], [1, 1]])
+        self.assertListEqual(solution.splitArrayEqualSum([5, 3]), [])
+        self.assertListEqual(solution.splitArrayEqualSum([15, 16, 20, 12]), [])
+        self.assertListEqual(solution.splitArrayEqualSum([1, 2, 3, 4, 5, 5]), [[1, 2, 3, 4], [5, 5]])
 
 if __name__ == '__main__':
     unittest.main()
