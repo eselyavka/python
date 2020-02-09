@@ -2,6 +2,7 @@
 
 import unittest
 
+
 class Solution(object):
     def floodFill(self, image, sr, sc, newColor):
         """
@@ -12,29 +13,30 @@ class Solution(object):
         :rtype: List[List[int]]
         """
         seen = [[False for _ in range(len(image[i]))] for i in range(len(image))]
-        old_color = image[sr][sc]
 
-        def fill(sr, sc):
-            if sr < 0 or sc < 0:
+        def fill(matrix, sr, sc, oldColor, newColor):
+            if sr >= len(matrix) or sr < 0 or sc >= len(matrix[0]) or sc < 0:
                 return
 
-            if sr >= len(image) or sc >= len(image[sr]):
+            if matrix[sr][sc] != oldColor or seen[sr][sc]:
                 return
 
-            if image[sr][sc] != old_color or seen[sr][sc]:
-                return
-
-            image[sr][sc] = newColor
             seen[sr][sc] = True
+            matrix[sr][sc] = newColor
 
-            fill(sr + 1, sc)
-            fill(sr - 1, sc)
-            fill(sr, sc + 1)
-            fill(sr, sc - 1)
+            # up
+            fill(matrix, sr+1, sc, oldColor, newColor)
+            # down
+            fill(matrix, sr-1, sc, oldColor, newColor)
+            # right
+            fill(matrix, sr, sc+1, oldColor, newColor)
+            # left
+            fill(matrix, sr, sc-1, oldColor, newColor)
 
-        fill(sr, sc)
+        fill(image, sr, sc, image[sr][sc], newColor)
 
         return image
+
 
 class TestSolution(unittest.TestCase):
 
@@ -52,6 +54,7 @@ class TestSolution(unittest.TestCase):
         self.assertEqual(solution.floodFill(
             [[0, 0, 0], [0, 0, 0]], 0, 0, 2),
                          [[2, 2, 2], [2, 2, 2]])
+
 
 if __name__ == '__main__':
     unittest.main()
