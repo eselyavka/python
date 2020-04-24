@@ -2,10 +2,12 @@
 
 import unittest
 
+
 class ListNode(object):
     def __init__(self, x):
         self.val = x
         self.next = None
+
 
 class Solution(object):
     def mergeTwoLists(self, l1, l2):
@@ -14,23 +16,18 @@ class Solution(object):
         :type l2: ListNode
         :rtype: ListNode
         """
-        res = ListNode('head')
-
-        itr = res
-
-        while l1 is not None and l2 is not None:
+        fake_head = tail = ListNode(float('-inf'))
+        while l1 and l2:
             if l1.val < l2.val:
-                itr.next = ListNode(l1.val)
-                l1 = l1.next
+                tail.next, l1 = l1, l1.next
             else:
-                itr.next = ListNode(l2.val)
-                l2 = l2.next
+                tail.next, l2 = l2, l2.next
+            tail = tail.next
 
-            itr = itr.next
+        tail.next = l1 or l2
 
-        itr.next = l1 if l1 is not None else l2
+        return fake_head.next
 
-        return res.next
 
 class TestSolution(unittest.TestCase):
 
@@ -58,6 +55,7 @@ class TestSolution(unittest.TestCase):
         self.assertTrue(solution.mergeTwoLists(lst3, lst4))
         self.assertTrue(solution.mergeTwoLists(lst5, None))
         self.assertTrue(solution.mergeTwoLists(None, lst5))
+
 
 if __name__ == '__main__':
     unittest.main()
