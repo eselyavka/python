@@ -9,35 +9,33 @@ class Solution(object):
         :type s: str
         :rtype: str
         """
-
-        open_par = []
-        close_par = []
-
-        arr = list(s)
+        open_par, close_par = [], []
 
         i = 0
-        while i < len(arr):
-            if arr[i] == '(':
-                open_par.append(arr[i])
-            if arr[i] == ')':
-                close_par.append(arr[i])
+        arr_s = list(s)
+        while i < len(arr_s):
+            if arr_s[i] == '(':
+                open_par.append(arr_s[i])
+            if arr_s[i] == ')':
+                close_par.append(arr_s[i])
                 if len(close_par) > len(open_par):
-                    arr[i] = ''
+                    arr_s[i] = ''
                     close_par.pop()
             i += 1
 
-        open_par = []
-        close_par = []
-        for i in range(len(arr) - 1, -1, -1):
-            if arr[i] == ')':
-                close_par.append(arr[i])
-            if arr[i] == '(':
-                open_par.append(arr[i])
+        open_par, close_par = [], []
+        i = len(arr_s) - 1
+        while i >= 0:
+            if arr_s[i] == ')':
+                close_par.append(arr_s[i])
+            if arr_s[i] == '(':
+                open_par.append(arr_s[i])
                 if len(open_par) > len(close_par):
-                    arr[i] = ''
                     open_par.pop()
+                    arr_s[i] = ''
+            i -= 1
 
-        return ''.join(arr)
+        return ''.join(arr_s)
 
 
 class TestSolution(unittest.TestCase):
