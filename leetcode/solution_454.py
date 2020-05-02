@@ -3,6 +3,7 @@
 import unittest
 from collections import defaultdict
 
+
 class Solution(object):
     def fourSumCount(self, A, B, C, D):
         """
@@ -12,22 +13,17 @@ class Solution(object):
         :type D: List[int]
         :rtype: int
         """
-        hash_A_B = defaultdict(int)
+        ab_dict = defaultdict(int)
+
         for a in A:
             for b in B:
-                hash_A_B[a+b] += 1
+                ab_dict[a + b] += 1
 
         res = 0
-
         for c in C:
             for d in D:
-                _sum = c + d
-                if _sum < 0:
-                    if abs(_sum) in hash_A_B:
-                        res += hash_A_B[abs(_sum)]
-                else:
-                    if -_sum in hash_A_B:
-                        res += hash_A_B[-_sum]
+                sum_ = c + d
+                res += ab_dict.get(abs(sum_) if sum_ < 0 else -sum_, 0)
 
         return res
 
