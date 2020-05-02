@@ -2,10 +2,12 @@
 
 import unittest
 
+
 class KV(object):
     def __init__(self, key, val):
         self.key = key
         self.val = val
+
 
 class MyAnotherHashMap(object):
 
@@ -54,7 +56,8 @@ class MyAnotherHashMap(object):
 
     def remove(self, key):
         """
-        Removes the mapping of the specified value key if this map contains a mapping for the key
+        Removes the mapping of the specified value key
+        if this map contains a mapping for the key
         :type key: int
         :rtype: void
         """
@@ -70,6 +73,7 @@ class MyAnotherHashMap(object):
                 del nodes[i]
                 break
             i += 1
+
 
 class MyHashMap(object):
 
@@ -100,11 +104,88 @@ class MyHashMap(object):
 
     def remove(self, key):
         """
-        Removes the mapping of the specified value key if this map contains a mapping for the key
+        Removes the mapping of the specified value key
+        if this map contains a mapping for the key
         :type key: int
         :rtype: void
         """
         self.arr[key] = None
+
+
+class ListNode(object):
+    def __init__(self, k, v):
+        self.key = k
+        self.val = v
+        self.next = None
+
+
+class MyHashMapChain(object):
+
+    def __init__(self):
+        """
+        Initialize your data structure here.
+        """
+        self.size = 1000
+        self.hash = [None] * self.size
+
+    def put(self, key, value):
+        """
+        value will always be non-negative.
+        :type key: int
+        :type value: int
+        :rtype: None
+        """
+        h = hash(key) % self.size
+        if self.hash[h] is None:
+            self.hash[h] = ListNode(key, value)
+        else:
+            node = self.hash[h]
+            while node:
+                if node.key == key:
+                    node.val = value
+                    break
+                if node.next is None:
+                    node.next = ListNode(key, value)
+                    break
+                node = node.next
+
+    def get(self, key):
+        """
+        Returns the value to which the specified key is mapped,
+        or -1 if this map contains no mapping for the key
+        :type key: int
+        :rtype: int
+        """
+        h = hash(key) % self.size
+        curr = self.hash[h]
+        if curr is None:
+            return -1
+        while curr:
+            if curr.key == key:
+                return curr.val
+            curr = curr.next
+        return -1
+
+    def remove(self, key):
+        """
+        Removes the mapping of the specified value key
+        if this map contains a mapping for the key
+        :type key: int
+        :rtype: None
+        """
+        h = hash(key) % self.size
+        curr = self.hash[h]
+        if curr is not None:
+            prev = None
+            while curr:
+                if curr.key == key:
+                    if prev:
+                        prev.next = curr.next
+                    else:
+                        self.hash[h] = curr.next
+                prev = curr
+                curr = curr.next
+
 
 class TestSolution(unittest.TestCase):
 
@@ -115,7 +196,12 @@ class TestSolution(unittest.TestCase):
 
         hashMap.remove(836)
 
-        for p in [[233, 568], [657, 790], [595, 271], [769, 219], [55, 112], [157, 493]]:
+        for p in [[233, 568],
+                  [657, 790],
+                  [595, 271],
+                  [769, 219],
+                  [55, 112],
+                  [157, 493]]:
             hashMap.put(*p)
 
         self.assertEqual(hashMap.get(920), -1)
@@ -147,6 +233,20 @@ class TestSolution(unittest.TestCase):
         self.assertEqual(hashMap.get(2), -1)
 
         hashMap.put(395, 865)
+
+        hash_map_chain = MyHashMapChain()
+        actual = []
+        actual.append(hash_map_chain.put(1, 1))
+        actual.append(hash_map_chain.put(2, 2))
+        actual.append(hash_map_chain.get(1))
+        actual.append(hash_map_chain.get(3))
+        actual.append(hash_map_chain.put(2, 1))
+        actual.append(hash_map_chain.get(2))
+        actual.append(hash_map_chain.remove(2))
+        actual.append(hash_map_chain.get(2))
+
+        self.assertListEqual(actual, [None, None, 1, -1, None, 1, None, -1])
+
 
 if __name__ == '__main__':
     unittest.main()
