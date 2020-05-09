@@ -2,25 +2,48 @@
 
 import unittest
 
+
 class Solution(object):
     def countPrimes(self, n):
         """
         :type n: int
         :rtype: int
         """
-        if n <=2:
+        if n <= 2:
             return 0
 
         prime = [True] * n
         prime[0] = prime[1] = False
         p = 2
-        while (p * p <= n):
+        while p * p <= n:
             if prime[p]:
                 for i in xrange(2*p, n, p):
                     prime[i] = False
             p += 1
 
         return sum(prime)
+
+
+class Solution2(object):
+    def countPrimes(self, n):
+        """
+        :type n: int
+        :rtype: int
+        """
+        if n <= 2:
+            return 0
+
+        prime = [True] * n
+        prime[0] = prime[1] = False
+        for i in range(2, n):
+            if prime[i]:
+                j = 2
+                while j * i < n:
+                    prime[j*i] = False
+                    j += 1
+
+        return sum(prime)
+
 
 class TestSolution(unittest.TestCase):
     def test_countPrimes(self):
@@ -32,6 +55,10 @@ class TestSolution(unittest.TestCase):
         self.assertEqual(solution.countPrimes(4), 2)
         self.assertEqual(solution.countPrimes(5), 2)
         self.assertEqual(solution.countPrimes(1500000), 114155)
+
+        solution = Solution2()
+        self.assertEqual(solution.countPrimes(10), 4)
+
 
 if __name__ == '__main__':
     unittest.main()
