@@ -4,6 +4,7 @@ import unittest
 from collections import defaultdict
 import heapq
 
+
 class Solution(object):
     def leastInterval(self, tasks, n):
         """
@@ -43,10 +44,41 @@ class Solution(object):
 
         return res
 
+
+class Solution2(object):
+    def leastInterval(self, tasks, n):
+        """
+        :type tasks: List[str]
+        :type n: int
+        :rtype: int
+        """
+        arr = [0] * 26
+        for task in tasks:
+            arr[ord(task) - ord('A')] += 1
+        arr.sort()
+
+        res = 0
+        while arr[25] > 0:
+            i = 0
+            while i <= n:
+                if not arr[25]:
+                    break
+                if i < 26 and arr[25 - i] > 0:
+                    arr[25 - i] -= 1
+                res += 1
+                i += 1
+            arr.sort()
+
+        return res
+
+
 class TestSolution(unittest.TestCase):
     def test_leastInterval(self):
         solution = Solution()
         self.assertEqual(solution.leastInterval(["A", "A", "A", "B", "B", "B"], 2), 8)
+        solution = Solution2()
+        self.assertEqual(solution.leastInterval(["A", "A", "A", "B", "B", "B"], 50), 50)
+
 
 if __name__ == '__main__':
     unittest.main()
