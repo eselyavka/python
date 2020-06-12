@@ -2,11 +2,13 @@
 
 import unittest
 
+
 class TreeNode(object):
     def __init__(self, val):
         self.val = val
         self.left = None
         self.right = None
+
 
 class Solution(object):
     def populateInorder(self, root, arr):
@@ -28,6 +30,32 @@ class Solution(object):
             if res[i] >= res[i+1]:
                 return False
         return True
+
+
+class Solution2(object):
+    def isValidBST(self, root):
+        """
+        :type root: TreeNode
+        :rtype: bool
+        """
+        current = root
+        s = []
+        inorder = []
+        while True:
+            if len(inorder) >= 2 and inorder[-2] >= inorder[-1]:
+                return False
+            if current is not None:
+                s.append(current)
+                current = current.left
+            elif s:
+                current = s.pop()
+                inorder.append(current.val)
+                current = current.right
+            else:
+                break
+
+        return True
+
 
 class TestSolution(unittest.TestCase):
 
@@ -69,6 +97,17 @@ class TestSolution(unittest.TestCase):
         self.assertTrue(solution.isValidBST(root5))
         self.assertFalse(solution.isValidBST(root6))
         self.assertFalse(solution.isValidBST(root7))
+
+        solution2 = Solution2()
+        self.assertFalse(solution2.isValidBST(root))
+        self.assertTrue(solution2.isValidBST(None))
+        self.assertTrue(solution2.isValidBST(root2))
+        self.assertTrue(solution2.isValidBST(root3))
+        self.assertTrue(solution2.isValidBST(root4))
+        self.assertTrue(solution2.isValidBST(root5))
+        self.assertFalse(solution2.isValidBST(root6))
+        self.assertFalse(solution2.isValidBST(root7))
+
 
 if __name__ == '__main__':
     unittest.main()
