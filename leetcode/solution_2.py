@@ -2,18 +2,20 @@
 
 import unittest
 
+
 class ListNode(object):
     def __init__(self, x):
         self.val = x
         self.next = None
 
+
 class Solution(object):
-    def list_to_int(self, l):
+    def list_to_int(self, L):
         i = 0
         res = 0
-        while l is not None:
-            res += l.val * 10**i
-            l = l.next
+        while L is not None:
+            res += L.val * 10**i
+            L = L.next
             i += 1
 
         return res
@@ -38,6 +40,42 @@ class Solution(object):
 
         return res
 
+
+class Solution2(object):
+    def addTwoNumbers(self, l1, l2):
+        """
+        :type l1: ListNode
+        :type l2: ListNode
+        :rtype: ListNode
+        """
+        if not l1 and not l2:
+            return None
+
+        pow_l1, l1_num = 0, 0
+        while l1:
+            l1_num += l1.val * (10 ** pow_l1)
+            l1 = l1.next
+            pow_l1 += 1
+
+        l2_num, pow_l2 = 0, 0
+        while l2:
+            l2_num += l2.val * (10 ** pow_l2)
+            l2 = l2.next
+            pow_l2 += 1
+
+        sum_ = l1_num + l2_num
+        if sum_ == 0:
+            return ListNode(sum_)
+
+        fake_head = buf = ListNode(float('inf'))
+        while sum_:
+            buf.next = ListNode(sum_ % 10)
+            buf = buf.next
+            sum_ /= 10
+
+        return fake_head.next
+
+
 class TestSolution(unittest.TestCase):
 
     def test_addTwoNumbers(self):
@@ -58,6 +96,16 @@ class TestSolution(unittest.TestCase):
             self.assertEqual(actual.val, expected[i])
             actual = actual.next
             i += 1
+
+        solution2 = Solution2()
+        actual = solution2.addTwoNumbers(lst, lst2)
+
+        i = 0
+        while actual is not None:
+            self.assertEqual(actual.val, expected[i])
+            actual = actual.next
+            i += 1
+
 
 if __name__ == '__main__':
     unittest.main()
