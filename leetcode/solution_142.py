@@ -2,10 +2,12 @@
 
 import unittest
 
+
 class ListNode(object):
     def __init__(self, x):
         self.val = x
         self.next = None
+
 
 class Solution(object):
     def detectCycle(self, head):
@@ -24,6 +26,26 @@ class Solution(object):
             head = head.next
 
         return None
+
+
+class Solution2(object):
+    def detectCycle(self, head):
+        """
+        :type head: ListNode
+        :rtype: ListNode
+        """
+        slow = fast = head
+
+        while slow and fast.next and fast.next.next:
+            slow, fast = slow.next, fast.next.next
+            if slow is fast:
+                slow = head
+                while slow and slow is not fast:
+                    slow, fast = slow.next, fast.next
+                return slow
+
+        return None
+
 
 class TestSolution(unittest.TestCase):
     def test_detectCycle(self):
@@ -50,6 +72,10 @@ class TestSolution(unittest.TestCase):
         self.assertIsNone(solution.detectCycle(lst))
         self.assertIsNone(solution.detectCycle(lst2))
         self.assertEqual(solution.detectCycle(lst3), lst3.next.next)
+
+        solution2 = Solution2()
+        self.assertEqual(solution2.detectCycle(lst3), lst3.next.next)
+
 
 if __name__ == '__main__':
     unittest.main()
