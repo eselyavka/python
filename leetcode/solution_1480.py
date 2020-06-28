@@ -17,8 +17,8 @@ class Solution(object):
         return nums
 
 
-class TestSo_runningSumlution(unittest.TestCase):
-    def test(self):
+class TestSolution(unittest.TestCase):
+    def test_runningSum(self):
         solution = Solution()
         self.assertListEqual(solution.runningSum([1, 2, 3, 4]), [1, 3, 6, 10])
 
