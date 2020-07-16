@@ -2,10 +2,12 @@
 
 import unittest
 
+
 class ListNode(object):
     def __init__(self, val):
         self.val = val
         self.next = None
+
 
 class Solution(object):
     def removeNthFromEnd(self, head, n):
@@ -35,6 +37,30 @@ class Solution(object):
 
         return arr[0]
 
+
+class Solution2(object):
+    def removeNthFromEnd(self, head, n):
+        """
+        :type head: ListNode
+        :type n: int
+        :rtype: ListNode
+        """
+        fake = ListNode('fake')
+        fake.next = head
+
+        first = fake.next
+        while n > 0:
+            first = first.next
+            n -= 1
+
+        second = fake
+        while first:
+            first, second = first.next, second.next
+        second.next = second.next.next
+
+        return fake.next
+
+
 class TestSolution(unittest.TestCase):
 
     def list_traversals(self, head):
@@ -58,6 +84,12 @@ class TestSolution(unittest.TestCase):
         actual = solution.removeNthFromEnd(node, 2)
 
         self.assertListEqual(self.list_traversals(actual), [1, 2, 3, 5])
+
+        solution2 = Solution2()
+
+        actual = solution2.removeNthFromEnd(node, 2)
+        self.assertListEqual(self.list_traversals(actual), [1, 2, 5])
+
 
 if __name__ == '__main__':
     unittest.main()
