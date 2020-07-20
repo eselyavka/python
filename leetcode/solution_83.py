@@ -2,10 +2,12 @@
 
 import unittest
 
+
 class ListNode(object):
     def __init__(self, x):
         self.val = x
         self.next = None
+
 
 class Solution(object):
     def deleteDuplicates(self, head):
@@ -27,6 +29,26 @@ class Solution(object):
             head = head.next
 
         return prev
+
+
+class Solution2(object):
+    def deleteDuplicates(self, head):
+        """
+        :type head: ListNode
+        :rtype: ListNode
+        """
+        it = head
+
+        while it:
+            next_distinct = it.next
+            while next_distinct and next_distinct.val == it.val:
+                next_distinct = next_distinct.next
+
+            it.next = next_distinct
+            it = next_distinct
+
+        return head
+
 
 class TestSolution(unittest.TestCase):
 
@@ -54,11 +76,18 @@ class TestSolution(unittest.TestCase):
 
         actual = self.list_to_list(solution.deleteDuplicates(lst))
         expected = [1, 2]
-        self.assertEqual(actual, expected)
+        self.assertListEqual(actual, expected)
+
+        actual = self.list_to_list(Solution2().deleteDuplicates(lst))
+        self.assertListEqual(actual, expected)
 
         actual = self.list_to_list(solution.deleteDuplicates(lst2))
         expected = [1, 2, 3]
-        self.assertEqual(actual, expected)
+        self.assertListEqual(actual, expected)
+
+        actual = self.list_to_list(Solution2().deleteDuplicates(lst2))
+        self.assertListEqual(actual, expected)
+
 
 if __name__ == '__main__':
     unittest.main()
