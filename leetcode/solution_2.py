@@ -76,6 +76,29 @@ class Solution2(object):
         return fake_head.next
 
 
+class Solution3(object):
+    def addTwoNumbers(self, l1, l2):
+        """
+        :type l1: ListNode
+        :type l2: ListNode
+        :rtype: ListNode
+        """
+        if not l1 and not l2:
+            return
+
+        sum_iter = dummy_head = ListNode()
+        carry = 0
+
+        while l1 or l2 or carry:
+            val = carry + (l1.val if l1 else 0) + (l2.val if l2 else 0)
+            l1 = l1.next if l1 else None
+            l2 = l2.next if l2 else None
+            sum_iter.next = ListNode(val % 10)
+            sum_iter, carry = sum_iter.next, val // 10
+
+        return dummy_head.next
+
+
 class TestSolution(unittest.TestCase):
 
     def test_addTwoNumbers(self):
@@ -99,6 +122,15 @@ class TestSolution(unittest.TestCase):
 
         solution2 = Solution2()
         actual = solution2.addTwoNumbers(lst, lst2)
+
+        i = 0
+        while actual is not None:
+            self.assertEqual(actual.val, expected[i])
+            actual = actual.next
+            i += 1
+
+        solution3 = Solution2()
+        actual = solution3.addTwoNumbers(lst, lst2)
 
         i = 0
         while actual is not None:
