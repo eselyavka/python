@@ -2,6 +2,7 @@
 
 import unittest
 
+
 class Solution(object):
     def _fib(self, n):
         a = 0
@@ -12,7 +13,7 @@ class Solution(object):
         if n == 1:
             return b
 
-        for i in range(2, n+1):
+        for _ in range(2, n+1):
             c = a + b
             a = b
             b = c
@@ -27,6 +28,28 @@ class Solution(object):
 
         return self._fib(n+1)
 
+
+class Solution2(object):
+    def climbStairs(self, n):
+        """
+        :type n: int
+        :rtype: int
+        """
+        if n == 1:
+            return n
+
+        dp = [0] * n
+        dp[0], dp[1] = 1, 1
+
+        for i in range(1, n):
+            j = 1
+            while j <= 2 and j <= i:
+                dp[i] += dp[i-j]
+                j += 1
+
+        return dp[n-1]
+
+
 class TestSolution(unittest.TestCase):
 
     def test_climbStairs(self):
@@ -34,6 +57,10 @@ class TestSolution(unittest.TestCase):
 
         self.assertEqual(solution.climbStairs(2), 2)
         self.assertEqual(solution.climbStairs(3), 3)
+
+        solution2 = Solution2()
+        self.assertEqual(solution2.climbStairs(4), 5)
+
 
 if __name__ == '__main__':
     unittest.main()
