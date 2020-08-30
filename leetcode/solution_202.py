@@ -2,32 +2,39 @@
 
 import unittest
 
+
 class Solution(object):
+    def number_to_array(self, n):
+        if n < 10:
+            return [n]
+
+        nums = []
+        while n:
+            nums.append(n % 10)
+            n = n // 10
+
+        return nums
+
     def isHappy(self, n):
         """
         :type n: int
         :rtype: bool
         """
-        d = set()
+        seen = set([n])
 
-        def rec(n):
-            def num_to_array(num, base):
-                if num < base:
-                    return [num]
-                return num_to_array(num // base, base) + [num%base]
-
-            num = sum([x**2 for x in num_to_array(n, 10)])
-
-            if num == 1:
+        def rec(mas):
+            n = sum([x**2 for x in mas])
+            if n == 1:
                 return True
-            elif num in d:
+            if n in seen:
                 return False
-            else:
-                d.add(num)
 
-            return rec(num)
+            seen.add(n)
 
-        return rec(n)
+            return rec(self.number_to_array(n))
+
+        return rec(self.number_to_array(n))
+
 
 class TestSolution(unittest.TestCase):
 
@@ -39,6 +46,7 @@ class TestSolution(unittest.TestCase):
         self.assertFalse(solution.isHappy(5))
         self.assertFalse(solution.isHappy(11))
         self.assertFalse(solution.isHappy(78))
+
 
 if __name__ == '__main__':
     unittest.main()
