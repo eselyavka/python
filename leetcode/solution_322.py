@@ -2,47 +2,23 @@
 
 import unittest
 
+
 class Solution(object):
-    def dp(self, coins, amount, minCoins):
-        for j in [c for c in coins if c <= amount]:
-            for i in range(1, amount + 1):
-                if i >= j:
-                    if minCoins[i-j] + 1 < minCoins[i]:
-                        minCoins[i] = minCoins[i-j] + 1
-
-        return minCoins[amount]
-
-    def _rec(self, coins, amount, memo):
-        if not amount:
-            return 0
-
-        if amount in coins:
-            memo[amount] = 1
-            return 1
-
-        if memo.has_key(amount):
-            return memo[amount]
-
-        min_coins = float('+inf')
-
-        for i in [c for c in coins if c < amount]:
-            num_coins = 1 + self._rec(coins, amount - i, memo)
-            if num_coins < min_coins:
-                min_coins = num_coins
-
-        memo[amount] = min_coins
-
-        return min_coins
-
     def coinChange(self, coins, amount):
         """
         :type coins: List[int]
         :type amount: int
         :rtype: int
         """
-        res = self.dp(coins, amount, [0] + [float('inf')]*amount)
+        minCoins = [0] + [float('+inf')] * amount
+        for j in [c for c in coins if c <= amount]:
+            for i in range(1, amount + 1):
+                if i >= j:
+                    if minCoins[i-j] + 1 < minCoins[i]:
+                        minCoins[i] = minCoins[i-j] + 1
 
-        return res if res != float('+inf') else -1
+        return -1 if minCoins[amount] == float('+inf') else minCoins[amount]
+
 
 class TestSolution(unittest.TestCase):
 
@@ -58,6 +34,7 @@ class TestSolution(unittest.TestCase):
         self.assertEqual(solution.coinChange([186, 419, 83, 408], 6249), 20)
         self.assertEqual(solution.coinChange([333, 364, 408, 118, 63, 270,
                                               69, 111, 218, 371, 305], 5615), 15)
+
 
 if __name__ == '__main__':
     unittest.main()
