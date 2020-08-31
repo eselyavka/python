@@ -2,25 +2,21 @@
 
 import unittest
 
+
 class Solution(object):
     def maxProfit(self, prices):
         """
         :type prices: List[int]
         :rtype: int
         """
-        if not prices:
-            return 0
+        min_so_far = float('+inf')
+        max_profit = 0
 
-        _min = prices[0]
-        maxprofit = 0
+        for price in prices:
+            min_so_far = min(min_so_far, price)
+            max_profit = max(max_profit, price - min_so_far)
 
-        for i in range(len(prices)):
-            if _min >= prices[i]:
-                _min = prices[i]
-            elif prices[i] - _min > maxprofit:
-                maxprofit = prices[i] - _min
-
-        return maxprofit
+        return max_profit
 
 
 class TestSolution(unittest.TestCase):
@@ -45,6 +41,7 @@ class TestSolution(unittest.TestCase):
         self.assertEqual(solution.maxProfit(arr7), 5)
         self.assertEqual(solution.maxProfit(arr8), 4)
         self.assertEqual(solution.maxProfit(arr9), 4)
+
 
 if __name__ == '__main__':
     unittest.main()
