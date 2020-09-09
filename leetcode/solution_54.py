@@ -21,7 +21,7 @@ class Solution(object):
 
             matrix[x][y] = float('-inf')
 
-            # left
+            # right
             while y < col:
                 y += 1
                 if matrix[x][y] != float('-inf'):
@@ -35,7 +35,7 @@ class Solution(object):
                     res.append(matrix[x][y])
                     matrix[x][y] = float('-inf')
 
-            # right
+            # left
             while y > init_y:
                 y -= 1
                 if matrix[x][y] != float('-inf'):
