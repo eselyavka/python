@@ -8,10 +8,8 @@ class Solution(object):
         :type S: str
         :rtype: int
         """
-        if not S:
-            return 0
-
         stack = [0]
+
         for c in S:
             if c == '(':
                 stack.append(0)
