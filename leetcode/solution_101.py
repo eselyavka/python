@@ -2,23 +2,13 @@
 
 import unittest
 
+
 class TreeNode(object):
     def __init__(self, val):
         self.val = val
         self.left = None
         self.right = None
 
-def rec(root, root2):
-    if root and root2:
-        opl = root.left if root.left is None else root.left.val
-        opr = root.right if root.right is None else root.right.val
-        op2l = root2.left if root2.left is None else root2.left.val
-        op2r = root2.right if root2.right is None else root2.right.val
-        return (opl == op2r and
-                opr == op2l and
-                rec(root.left, root2.right) and
-                rec(root.right, root2.left))
-    return True
 
 class Solution(object):
     def isSymmetric(self, root):
@@ -26,7 +16,20 @@ class Solution(object):
         :type root: TreeNode
         :rtype: bool
         """
-        return rec(root, root)
+        if not root:
+            return True
+
+        def mirror(root1, root2):
+            if not root1 and not root2:
+                return True
+            return (root1 and
+                    root2 and
+                    root1.val == root2.val and
+                    mirror(root1.left, root2.right) and
+                    mirror(root1.right, root2.left))
+
+        return mirror(root.left, root.right)
+
 
 class TestSolution(unittest.TestCase):
 
@@ -55,6 +58,7 @@ class TestSolution(unittest.TestCase):
         self.assertFalse(solution.isSymmetric(root2))
         self.assertTrue(solution.isSymmetric(root3))
         self.assertTrue(solution.isSymmetric(None))
+
 
 if __name__ == '__main__':
     unittest.main()
