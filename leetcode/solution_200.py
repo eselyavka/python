@@ -31,6 +31,9 @@ class Solution(object):
         islands = 0
         for row in range(len(grid)):
             for col in range(len(grid[row])):
+                if seen[row][col]:
+                    continue
+
                 if self.dfs(grid, seen, row, col):
                     islands += 1
 
