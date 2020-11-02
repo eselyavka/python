@@ -21,15 +21,20 @@ class Solution2(object):
         :type k: int
         :rtype: int
         """
-        invert = [x*-1 for x in nums]
-        heapq.heapify(invert)
+        if not nums:
+            return 0
 
-        res = None
-        while k:
-            res = heapq.heappop(invert)
-            k -= 1
+        if k == 1:
+            return max(nums)
 
-        return res * -1
+        heap = []
+
+        for num in nums:
+            heapq.heappush(heap, num)
+            if len(heap) == k + 1:
+                heapq.heappop(heap)
+
+        return heap[0]
 
 
 class TestSolution(unittest.TestCase):
