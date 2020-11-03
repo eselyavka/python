@@ -2,7 +2,33 @@
 
 import unittest
 
+
 class Solution(object):
+    def simplifyPath(self, path):
+        """
+        :type path: str
+        :rtype: str
+        """
+        path_arr = [token for token in path.split('/') if token not in ['.', '']]
+
+        stack = ['/'] if path[0] == '/' else []
+
+        for item in path_arr:
+            if item == '..':
+                if not stack or stack[-1] == '..':
+                    stack.append(item)
+                else:
+                    if stack[-1] != '/':
+                        stack.pop()
+            else:
+                stack.append(item)
+
+        res = '/'.join(stack)
+
+        return res[res.startswith('//'):]
+
+
+class Solution2(object):
     def simplifyPath(self, path):
         """
         :type path: str
@@ -30,6 +56,7 @@ class Solution(object):
 
         return '/' + '/'.join(res)
 
+
 class TestSolution(unittest.TestCase):
     def test_simplifyPath(self):
         solution = Solution()
@@ -40,6 +67,16 @@ class TestSolution(unittest.TestCase):
         self.assertEqual(solution.simplifyPath('/'), '/')
         self.assertEqual(solution.simplifyPath('///'), '/')
         self.assertEqual(solution.simplifyPath('/..'), '/')
+
+        solution2 = Solution()
+        self.assertEqual(solution2.simplifyPath('/home/'), '/home')
+        self.assertEqual(solution2.simplifyPath('/a/./b/../../c/'), '/c')
+        self.assertEqual(solution2.simplifyPath('/home//foo/'), '/home/foo')
+        self.assertEqual(solution2.simplifyPath('/../'), '/')
+        self.assertEqual(solution2.simplifyPath('/'), '/')
+        self.assertEqual(solution2.simplifyPath('///'), '/')
+        self.assertEqual(solution2.simplifyPath('/..'), '/')
+
 
 if __name__ == '__main__':
     unittest.main()
