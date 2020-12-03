@@ -2,10 +2,12 @@
 
 import unittest
 
+
 class ListNode(object):
     def __init__(self, x):
         self.val = x
         self.next = None
+
 
 class Solution(object):
     def middleNode(self, head):
@@ -29,19 +31,26 @@ class Solution(object):
             _head = _head.next
             i += 1
 
+
+class Solution2(object):
+    def middleNode(self, head):
+        """
+        :type head: ListNode
+        :rtype: ListNode
+        """
+        fast = slow = head
+        while slow and fast and fast.next:
+            slow = slow.next
+            fast = fast.next.next
+
+        return slow
+
+
 class TestSolution(unittest.TestCase):
-
-    def list_to_list(self, head):
-        actual = []
-
-        while head is not None:
-            actual += [head.val]
-            head = head.next
-
-        return actual
 
     def test_middleNode(self):
         solution = Solution()
+        solution2 = Solution()
 
         lst = ListNode(1)
         lst.next = ListNode(2)
@@ -51,15 +60,14 @@ class TestSolution(unittest.TestCase):
         lst.next.next.next.next.next = ListNode(5)
         lst.next.next.next.next.next.next = ListNode(6)
 
-        actual = self.list_to_list(solution.middleNode(lst))
-        expected = [3, 4, 5, 6]
-        self.assertEqual(actual, expected)
+        self.assertEqual(solution.middleNode(lst).val, 3)
+        self.assertEqual(solution2.middleNode(lst).val, 3)
 
         lst = ListNode(1)
 
-        actual = self.list_to_list(solution.middleNode(lst))
-        expected = [1]
-        self.assertEqual(actual, expected)
+        self.assertEqual(solution.middleNode(lst).val, 1)
+        self.assertEqual(solution2.middleNode(lst).val, 1)
+
 
 if __name__ == '__main__':
     unittest.main()
