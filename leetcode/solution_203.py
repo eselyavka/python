@@ -2,10 +2,12 @@
 
 import unittest
 
+
 class ListNode(object):
     def __init__(self, x):
         self.val = x
         self.next = None
+
 
 class Solution(object):
     def removeElements(self, head, val):
@@ -14,20 +16,21 @@ class Solution(object):
         :type val: int
         :rtype: ListNode
         """
-        prev = None
-        _head = head
-
-        while head:
-            if head.val == val:
-                if prev:
-                    prev.next = head.next
-                else:
-                    _head = head.next
-            else:
-                prev = head
-
+        # if we have elements in the beginning
+        while head and head.val == val:
             head = head.next
-        return _head
+
+        prev, it = None, head
+        while it:
+            if it.val == val:
+                prev.next = it.next
+            else:
+                prev = it
+
+            it = it.next
+
+        return head
+
 
 class TestSolution(unittest.TestCase):
 
@@ -89,6 +92,7 @@ class TestSolution(unittest.TestCase):
         actual = self.list_to_list(solution.removeElements(lst, 2))
         expected = [1, 1]
         self.assertEqual(actual, expected)
+
 
 if __name__ == '__main__':
     unittest.main()
