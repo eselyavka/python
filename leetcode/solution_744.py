@@ -37,9 +37,33 @@ class Solution(object):
             return res[0]
 
 
+class Solution2(object):
+    def nextGreatestLetter(self, letters, target):
+        """
+        :type letters: List[str]
+        :type target: str
+        :rtype: str
+        """
+        for c in letters:
+            if c > target:
+                return c
+
+        return letters[0]
+
+
 class TestSolution(unittest.TestCase):
     def test_nextGreatestLetter(self):
         solution = Solution()
+        self.assertEqual(solution.nextGreatestLetter(["c", "f", "j"], "a"), "c")
+        self.assertEqual(solution.nextGreatestLetter(["c", "f", "j"], "z"), "c")
+        self.assertEqual(solution.nextGreatestLetter(["c", "f", "j"], "c"), "f")
+        self.assertEqual(solution.nextGreatestLetter(["c", "f", "j"], "d"), "f")
+        self.assertEqual(solution.nextGreatestLetter(["c", "f", "j"], "g"), "j")
+        self.assertEqual(solution.nextGreatestLetter(["c", "f", "j"], "j"), "c")
+        self.assertEqual(solution.nextGreatestLetter(["c", "f", "j"], "k"), "c")
+        self.assertEqual(solution.nextGreatestLetter(["e", "e", "e", "e", "e", "e",
+                                                      "n", "n", "n", "n"], "n"), "e")
+        solution = Solution2()
         self.assertEqual(solution.nextGreatestLetter(["c", "f", "j"], "a"), "c")
         self.assertEqual(solution.nextGreatestLetter(["c", "f", "j"], "z"), "c")
         self.assertEqual(solution.nextGreatestLetter(["c", "f", "j"], "c"), "f")
