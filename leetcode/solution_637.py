@@ -1,17 +1,21 @@
 #!/usr/bin/env python
 
+from collections import deque
+
+
 class TreeNode(object):
     def __init__(self, val):
         self.val = val
         self.left = None
         self.right = None
 
+
 class Solution(object):
 
     @staticmethod
     def _traverse(root, val_by_levels, level=1):
         if root:
-            if val_by_levels.has_key(level):
+            if level in val_by_levels:
                 val_by_levels[level].append(root.val)
             else:
                 val_by_levels[level] = [root.val]
@@ -32,6 +36,33 @@ class Solution(object):
 
         return res
 
+
+class Solution2(object):
+    def averageOfLevels(self, root):
+        """
+        :type root: TreeNode
+        :rtype: List[float]
+        """
+        if not root:
+            return []
+        q = deque()
+        q.appendleft(root)
+        res = []
+        while q:
+            size = len(q)
+            sum_, cnt = 0, size
+            while size:
+                node = q.pop()
+                sum_ += node.val
+                if node.left:
+                    q.appendleft(node.left)
+                if node.right:
+                    q.appendleft(node.right)
+                size -= 1
+            res.append(float(sum_) / float(cnt))
+        return res
+
+
 if __name__ == '__main__':
 
     root = TreeNode(3)
@@ -51,6 +82,11 @@ if __name__ == '__main__':
     root2.left.right.right = None
 
     avg1 = Solution().averageOfLevels(root)
-    print avg1
-    avg2 = Solution().averageOfLevels(root)
-    print avg2
+    assert avg1 == [3.0, 14.5, 27.333333333333332]
+    avg2 = Solution().averageOfLevels(root2)
+    assert avg2 == [3.0, 2.0, 2.0, 1.0]
+
+    avg11 = Solution2().averageOfLevels(root)
+    assert avg11 == [3.0, 14.5, 27.333333333333332]
+    avg2 = Solution2().averageOfLevels(root2)
+    assert avg2 == [3.0, 2.0, 2.0, 1.0]
