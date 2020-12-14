@@ -1,12 +1,15 @@
 #!/usr/bin/env python
 
 import unittest
+from collections import deque
+
 
 class TreeNode(object):
     def __init__(self, val):
         self.val = val
         self.left = None
         self.right = None
+
 
 class Solution(object):
     def levelOrderBottom(self, root):
@@ -36,6 +39,37 @@ class Solution(object):
 
         return res
 
+
+class Solution2(object):
+    def levelOrderBottom(self, root):
+        """
+        :type root: TreeNode
+        :rtype: List[List[int]]
+        """
+        if not root:
+            return []
+
+        q = deque()
+        q.appendleft(root)
+        res = []  # or create one more deque and appendleft
+        while q:
+            size = len(q)
+            acc = []
+            while size:
+                node = q.pop()
+                acc.append(node.val)
+                if node.left:
+                    q.appendleft(node.left)
+                if node.right:
+                    q.appendleft(node.right)
+                size -= 1
+            res.append(acc)
+
+        res.reverse()
+
+        return res
+
+
 class TestSolution(unittest.TestCase):
 
     def test_levelOrderBottom(self):
@@ -49,6 +83,12 @@ class TestSolution(unittest.TestCase):
 
         self.assertListEqual(solution.levelOrderBottom(root),
                              [[15, 7], [9, 20], [3]])
+
+        solution2 = Solution2()
+
+        self.assertListEqual(solution2.levelOrderBottom(root),
+                             [[15, 7], [9, 20], [3]])
+
 
 if __name__ == '__main__':
     unittest.main()
