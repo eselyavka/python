@@ -2,11 +2,13 @@
 
 import unittest
 
+
 class TreeNode(object):
     def __init__(self, val):
         self.val = val
         self.left = None
         self.right = None
+
 
 class Solution(object):
     def _tree_traversals(self, root, arr, x):
@@ -45,6 +47,36 @@ class Solution(object):
 
         return p_arr[i-1]
 
+
+class Solution2(object):
+    def lowestCommonAncestor(self, root, p, q):
+        """
+        :type root: TreeNode
+        :type p: TreeNode
+        :type q: TreeNode
+        :rtype: TreeNode
+        """
+        def rec(root, p, q):
+            if not root:
+                return 0, None
+
+            left_res = rec(root.left, p, q)
+
+            if left_res[0] == 2:
+                return left_res
+
+            right_res = rec(root.right, p, q)
+
+            if right_res[0] == 2:
+                return right_res
+
+            num_nodes = left_res[0] + right_res[0] + int(root is p) + int(root is q)
+
+            return num_nodes, root if num_nodes == 2 else None
+
+        return rec(root, p, q)[1]
+
+
 class TestSolution(unittest.TestCase):
 
     def test_lowestCommonAncestor(self):
@@ -60,8 +92,13 @@ class TestSolution(unittest.TestCase):
 
         solution = Solution()
 
-        self.assertEqual(solution.lowestCommonAncestor(root, TreeNode(2), TreeNode(8)).val, 6)
-        self.assertEqual(solution.lowestCommonAncestor(root, TreeNode(2), TreeNode(4)).val, 2)
+        self.assertEqual(solution.lowestCommonAncestor(root, root.left, root.right).val, 6)
+        self.assertEqual(solution.lowestCommonAncestor(root, root.left, root.left.right).val, 2)
+
+        solution2 = Solution2()
+        self.assertEqual(solution2.lowestCommonAncestor(root, root.left, root.right).val, 6)
+        self.assertEqual(solution2.lowestCommonAncestor(root, root.left, root.left.right).val, 2)
+
 
 if __name__ == '__main__':
     unittest.main()
