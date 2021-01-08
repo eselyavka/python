@@ -2,6 +2,7 @@
 
 import unittest
 
+
 class Solution(object):
     def backspaceCompare(self, S, T):
         """
@@ -9,28 +10,24 @@ class Solution(object):
         :type T: str
         :rtype: bool
         """
-        stackS = []
-        stackT = []
+        ss = []
+        ts = []
 
-        for c in S:
-            if c == '#':
-                try:
-                    stackS.pop()
-                except IndexError:
-                    pass
-            else:
-                stackS.append(c)
+        def process_string(s, stack):
+            for c in s:
+                if c == '#':
+                    try:
+                        stack.pop()
+                    except IndexError:
+                        pass
+                    continue
+                stack.append(c)
 
-        for c in T:
-            if c == '#':
-                try:
-                    stackT.pop()
-                except IndexError:
-                    pass
-            else:
-                stackT.append(c)
+        process_string(S, ss)
+        process_string(T, ts)
 
-        return ''.join(stackS) == ''.join(stackT)
+        return ss == ts
+
 
 class TestSolution(unittest.TestCase):
     def test_backspaceCompare(self):
@@ -40,6 +37,7 @@ class TestSolution(unittest.TestCase):
         self.assertTrue(solution.backspaceCompare("a##c", "#a#c"))
         self.assertFalse(solution.backspaceCompare("a#c", "b"))
         self.assertTrue(solution.backspaceCompare("y#fo##f", "y#f#o##f"))
+
 
 if __name__ == '__main__':
     unittest.main()
