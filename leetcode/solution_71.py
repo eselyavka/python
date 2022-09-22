@@ -9,23 +9,18 @@ class Solution(object):
         :type path: str
         :rtype: str
         """
-        path_arr = [token for token in path.split('/') if token not in ['.', '']]
+        res = "/"
+        tokens = [t for t in path.split("/") if t not in ["","."]]
+        dirs = []
 
-        stack = ['/'] if path[0] == '/' else []
-
-        for item in path_arr:
-            if item == '..':
-                if not stack or stack[-1] == '..':
-                    stack.append(item)
-                else:
-                    if stack[-1] != '/':
-                        stack.pop()
+        for token in tokens:
+            if token ==  "..":
+                if dirs:
+                    dirs.pop()
             else:
-                stack.append(item)
+                dirs.append(token)
 
-        res = '/'.join(stack)
-
-        return res[res.startswith('//'):]
+        return res + '/'.join(dirs)
 
 
 class Solution2(object):
