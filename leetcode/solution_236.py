@@ -39,15 +39,71 @@ class Solution(object):
         return res[1]
 
 
+class Solution2(object):
+    def lowestCommonAncestor(self, root, p, q):
+        """
+        :type root: TreeNode
+        :type p: TreeNode
+        :type q: TreeNode
+        :rtype: TreeNode
+        """
+        ppath = []
+        qpath = []
+        paths = []
+
+        def rec(root, node, path):
+            if not root:
+                return
+
+            path.append(root)
+
+            if root == node:
+                paths.append(path[:])
+                return
+
+            rec(root.left, node, path)
+            rec(root.right, node, path)
+
+            path.pop()
+
+        rec(root, p, ppath)
+        rec(root, q, qpath)
+
+        n = len(paths[0])
+        m = len(paths[1])
+
+        i, j = 0, 0
+
+        while i < n and j < m:
+            if paths[0][i] != paths[1][j]:
+                return paths[0][i-1]
+
+            i += 1
+            j += 1
+
+        if i < n:
+            return paths[0][i-1]
+
+        if j < m:
+            return paths[1][j-1]
+
+
 class TestSolution(unittest.TestCase):
     def test_lowestCommonAncestor(self):
         solution = Solution()
+        solution2 = Solution2()
 
         root = TreeNode(1)
         root.left = TreeNode(2)
         root.right = TreeNode(3)
 
         actual = solution.lowestCommonAncestor(root, root.left, root.right)
+
+        self.assertEqual([actual.val,
+                          actual.left.val,
+                          actual.right.val], [1, 2, 3])
+
+        actual = solution2.lowestCommonAncestor(root, root.left, root.right)
 
         self.assertEqual([actual.val,
                           actual.left.val,
