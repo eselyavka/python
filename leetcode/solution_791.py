@@ -1,29 +1,31 @@
 #!/usr/bin/env python
 
 import unittest
-from collections import defaultdict
+from collections import Counter
 
 class Solution(object):
-    def customSortString(self, S, T):
+    def customSortString(self, order, s):
         """
-        :type S: str
-        :type T: str
+        :type order: str
+        :type s: str
         :rtype: str
         """
-        if not S:
-            return T
+        if not order:
+            return s
 
-        dT = defaultdict(int)
+        frequencies = Counter(s)
 
-        for c in T:
-            dT[c] += 1
+        res = ""
+        for c in order:
+            freq = frequencies.get(c)
+            if freq is not None:
+                res += c * freq
+                frequencies.pop(c)
 
-        res = ''
-        for c in S:
-            res += c * dT[c]
-            dT[c] = 0
+        leftovers = "".join([c * frequencies[c] for c in frequencies])
 
-        return res + ''.join([key * dT[key] for key in dT])
+        return res + leftovers
+
 
 class TestSolution(unittest.TestCase):
 
@@ -31,9 +33,10 @@ class TestSolution(unittest.TestCase):
         solution = Solution()
         self.assertEqual(solution.customSortString("cba", "abcd"), "cbad")
         self.assertEqual(solution.customSortString("", "abcd"), "abcd")
-        self.assertEqual(solution.customSortString("a", "bcdaa"), "aacbd")
+        self.assertEqual(solution.customSortString("a", "bcdaa"), "aabcd")
         self.assertEqual(solution.customSortString("ab", "bcdaa"), "aabcd")
         self.assertEqual(solution.customSortString("kqep", "pekeq"), "kqeep")
+
 
 if __name__ == '__main__':
     unittest.main()
