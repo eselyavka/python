@@ -27,14 +27,7 @@ class Solution2(object):
         if k == 1:
             return max(nums)
 
-        heap = []
-
-        for num in nums:
-            heapq.heappush(heap, num)
-            if len(heap) == k + 1:
-                heapq.heappop(heap)
-
-        return heap[0]
+        return heapq.nlargest(k, nums)[-1]
 
 
 class TestSolution(unittest.TestCase):
