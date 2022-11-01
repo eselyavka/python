@@ -9,14 +9,14 @@ class Solution(object):
         :rtype: int
         """
         left, right = 0, len(height) - 1
-        _max = 0
+        _max = -1
 
         while left <= right:
             if height[right] >= height[left]:
-                _max = max(_max, min(height[left], height[right]) * (right - left))
+                _max = max(_max, height[left] * (right - left))
                 left += 1
             else:
-                _max = max(_max, min(height[left], height[right]) * (right - left))
+                _max = max(_max, height[right] * (right - left))
                 right -= 1
 
         return _max
