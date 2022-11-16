@@ -20,21 +20,13 @@ class Solution(object):
         if not p and not q:
             return True
 
-        def rec(tree1, tree2):
-            if not tree1 and not tree2:
-                return True
+        if p and not q:
+            return False
 
-            if not tree1 and tree2:
-                return False
+        if not p and q:
+            return False
 
-            if tree1 and not tree2:
-                return False
-
-            return (rec(tree1.left, tree2.left) and
-                    rec(tree1.right, tree2.right) and
-                    tree1.val == tree2.val)
-
-        return rec(p, q)
+        return p.val == q.val and self.isSameTree(p.left, q.left)  and self.isSameTree(p.right, q.right)
 
 
 class TestSolution(unittest.TestCase):
