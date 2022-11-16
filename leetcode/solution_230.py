@@ -2,11 +2,13 @@
 
 import unittest
 
+
 class TreeNode(object):
     def __init__(self, val):
         self.val = val
         self.left = None
         self.right = None
+
 
 class Solution(object):
     def kthSmallest(self, root, k):
@@ -27,6 +29,31 @@ class Solution(object):
 
         return res[k-1]
 
+
+class Solution2(object):
+    def kthSmallest(self, root, k):
+        """
+        :type root: TreeNode
+        :type k: int
+        :rtype: int
+        """
+        curr=root
+        s = []
+
+        while True:
+            if curr is not None:
+                s.append(curr)
+                curr = curr.left
+            elif s:
+                node = s.pop()
+                k -= 1
+                if not k:
+                    return node.val
+                curr = node.right
+            else:
+                break
+
+
 class TestSolution(unittest.TestCase):
 
     def test_kthSmallest(self):
@@ -44,8 +71,13 @@ class TestSolution(unittest.TestCase):
 
         solution = Solution()
 
-        self.assertEquals(solution.kthSmallest(root, 1), 1)
-        self.assertEquals(solution.kthSmallest(root2, 3), 3)
+        self.assertEqual(solution.kthSmallest(root, 1), 1)
+        self.assertEqual(solution.kthSmallest(root2, 3), 3)
+
+        solution2 = Solution2()
+        self.assertEqual(solution2.kthSmallest(root, 1), 1)
+        self.assertEqual(solution2.kthSmallest(root2, 3), 3)
+
 
 if __name__ == '__main__':
     unittest.main()
