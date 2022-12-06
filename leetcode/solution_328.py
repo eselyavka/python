@@ -18,31 +18,26 @@ class Solution(object):
         if not head:
             return head
 
-        if not head.next:
-            return head
+        odd_s = odd = ListNode("-inf")
+        even_s = even = ListNode("-inf")
 
-        odd_head = odd = ListNode('odd')
-        even_head = even = ListNode('even')
-        i = 1
-        while head:
-            if i % 2 == 0:
-                even.next = head
-                even = even.next
-            else:
-                odd.next = head
+        curr = head
+        i = 0
+        while curr:
+            if i % 2 == 1:
+                odd.next = curr
                 odd = odd.next
-            buf = head.next
-            head.next = None
-            head = buf
+            else:
+                even.next = curr
+                even = even.next
+
             i += 1
+            buf = curr.next
+            curr.next = None
+            curr = buf
 
-        tail = even_head.next
-        while tail:
-            odd.next = tail
-            odd = odd.next
-            tail = tail.next
-
-        return odd_head.next
+        even.next = odd_s.next
+        return even_s.next
 
 
 class TestSolution(unittest.TestCase):
