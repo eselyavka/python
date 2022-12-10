@@ -12,11 +12,11 @@ class Solution(object):
             return 0
 
         i, j = 0, 0
-        n = len(t)
-        m = len(s)
+        n = len(s)
+        m = len(t)
 
-        ans = len(t)
-        while i < m and j < n:
+        ans = m
+        while i < n and j < m:
             if s[i] == t[j]:
                 i += 1
                 j += 1
