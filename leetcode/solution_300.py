@@ -2,29 +2,26 @@
 
 import unittest
 
+
 class Solution(object):
     def lengthOfLIS(self, nums):
         """
         :type nums: List[int]
         :rtype: int
         """
+        n = len(nums)
+        if n == 1:
+            return 1
 
-        if not nums:
-            return 0
+        dp = [1] * n
 
-        arr = [1 for _ in range(len(nums))]
-        maxans = 1
-
-        for i in range(1, len(nums)):
-            maxval = 0
+        for i in range(1, n):
             for j in range(0, i):
                 if nums[i] > nums[j]:
-                    maxval = max(arr[j], maxval)
+                    dp[i] = max(dp[i], 1 + dp[j])
 
-            arr[i] = maxval + 1
-            maxans = max(maxans, arr[i])
+        return max(dp)
 
-        return maxans
 
 class TestSolution(unittest.TestCase):
 
@@ -47,6 +44,7 @@ class TestSolution(unittest.TestCase):
         self.assertEqual(solution.lengthOfLIS(nums5), 2)
         self.assertEqual(solution.lengthOfLIS(nums6), 6)
         self.assertEqual(solution.lengthOfLIS(nums7), 5)
+
 
 if __name__ == '__main__':
     unittest.main()
