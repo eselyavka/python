@@ -2,6 +2,7 @@
 
 import unittest
 
+
 class Solution(object):
     def wordBreak(self, s, wordDict):
         """
@@ -9,33 +10,19 @@ class Solution(object):
         :type wordDict: List[str]
         :rtype: bool
         """
-        if not wordDict and not s:
-            return True
+        n = len(s)
+        dp = [False] * (n + 1)
 
-        if not wordDict and s:
-            return False
+        dp[n] = True
+        for i in range(n - 1, -1, -1):
+            for w in wordDict:
+                if i + len(w) <= len(s) and s[i: i + len(w)] == w:
+                    dp[i] = dp[i + len(w)]
+                if dp[i]:
+                    break
 
-        if not s and wordDict:
-            return False
+        return dp[0]
 
-        def in_dict(s):
-            return s in wordDict
-
-        size = len(s)
-        wb = [False] * (size+1)
-        for i in range(1, size+1):
-            if not wb[i] and in_dict(s[:i]):
-                wb[i] = True
-            if wb[i]:
-                if i == size:
-                    return True
-                for j in range(i, size+1):
-                    if not wb[j] and in_dict(s[i:j]):
-                        wb[j] = True
-                    if j == size and wb[j]:
-                        return True
-
-        return False
 
 class TestSolution(unittest.TestCase):
 
@@ -48,6 +35,7 @@ class TestSolution(unittest.TestCase):
         self.assertFalse(solution.wordBreak('a', []))
         self.assertTrue(solution.wordBreak('bb',
                                            ["a", "b", "bbb", "bbbb"]))
+
 
 if __name__ == '__main__':
     unittest.main()
