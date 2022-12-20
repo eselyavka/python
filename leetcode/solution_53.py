@@ -2,22 +2,23 @@
 
 import unittest
 
+
 class Solution(object):
     def maxSubArray(self, nums):
         """
         :type nums: List[int]
         :rtype: int
         """
-        max_so_far = float('-inf')
-        max_ending_here = 0
 
+        ans = float("-inf")
+        acc = 0
         for num in nums:
-            max_ending_here = max_ending_here + num
+            acc += num
+            ans = max(ans, acc)
+            acc = max(acc, 0)
 
-            max_so_far = max(max_so_far, max_ending_here)
-            max_ending_here = max(max_ending_here, 0)
+        return ans
 
-        return max_so_far
 
 class TestSolution(unittest.TestCase):
 
@@ -27,6 +28,7 @@ class TestSolution(unittest.TestCase):
         solution = Solution()
         self.assertEqual(solution.maxSubArray(nums), 6)
         self.assertEqual(solution.maxSubArray(nums2), -1)
+
 
 if __name__ == '__main__':
     unittest.main()
