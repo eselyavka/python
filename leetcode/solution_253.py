@@ -2,36 +2,30 @@
 
 import unittest
 
+
 class Solution(object):
     def minMeetingRooms(self, intervals):
         """
-        :type intervals: List[Interval]
+        :type intervals: List[List[int]]
         :rtype: int
         """
-        if not intervals:
-            return 0
 
-        size = len(intervals)
+        start_points = sorted([t[0] for t in intervals])
+        end_points = sorted([t[1] for t in intervals])
 
-        if size == 1:
-            return 1
+        n = len(intervals)
+        s, e, ans, count = [0] * 4
 
-        start = sorted([x[0] for x in intervals])
-        end = sorted([x[1] for x in intervals])
-        s, e, rooms, available = 0, 0, 0, 0
-
-        while s < size - 1:
-            if start[s] < end[e]:
-                if available == 0:
-                    rooms += 1
-                else:
-                    available -= 1
+        while s < n:
+            if start_points[s] < end_points[e]:
+                count += 1
                 s += 1
             else:
-                available += 1
                 e += 1
+                count -= 1
+            ans = max(ans, count)
 
-        return rooms
+        return ans
 
 class TestSolution(unittest.TestCase):
     def test_minMeetingRooms(self):
