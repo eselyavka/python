@@ -2,25 +2,22 @@
 
 import unittest
 
+
 class Solution(object):
     def rotate(self, matrix):
         """
         :type matrix: List[List[int]]
-        :rtype: void Do not return anything, modify matrix in-place instead.
+        :rtype: None Do not return anything, modify matrix in-place instead.
         """
-        row = len(matrix)
-        l = row - 1
-        for i in range(row/2):
-            for j in range(i, (l-i)):
-                p1 = matrix[i][j]
-                p2 = matrix[j][l-i]
-                p3 = matrix[l-i][l-j]
-                p4 = matrix[l-j][i]
+        n = len(matrix)
 
-                matrix[j][l-i], p1 = p1, matrix[j][l-i]
-                matrix[l-i][l-j], p2 = p2, matrix[l-i][l-j]
-                matrix[l-j][i], p3 = p3, matrix[l-j][i]
-                matrix[i][j], p4 = p4, matrix[i][j]
+        for i in range(n):
+            for j in range(i + 1, n):
+                matrix[i][j], matrix[j][i] = matrix[j][i], matrix[i][j]
+
+        for i in range(n):
+            matrix[i].reverse()
+
 
 class TestSolution(unittest.TestCase):
     def test_rotate(self):
@@ -33,6 +30,7 @@ class TestSolution(unittest.TestCase):
         self.assertListEqual(_in, [[7, 4, 1],
                                    [8, 5, 2],
                                    [9, 6, 3]])
+
 
 if __name__ == '__main__':
     unittest.main()
