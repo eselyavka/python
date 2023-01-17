@@ -2,56 +2,52 @@
 
 import unittest
 
+
 class Solution(object):
-    def get_crashing_elements(self, board):
-        elements = set()
-
-        for i in range(len(board)):
-            for j in range(len(board[i])):
-                element = board[i][j]
-
-                if element == 0:
-                    continue
-
-                if (j - 1 >= 0 and j + 1 < len(board[i]) and
-                        board[i][j - 1] == element and board[i][j + 1] == element or
-                        j - 2 >= 0 and board[i][j - 1] == element and board[i][j - 2] == element or
-                        j + 2 <= len(board[i]) - 1 and board[i][j + 1] == element and
-                        board[i][j + 2] == element or
-                        i - 1 >= 0 and i + 1 < len(board) and board[i - 1][j] == element and
-                        board[i + 1][j] == element or
-                        i - 2 >= 0 and board[i - 1][j] == element and board[i - 2][j] == element or
-                        i + 2 <= len(board) - 1 and board[i + 1][j] == element and
-                        board[i + 2][j] == element):
-                    elements.add((i, j))
-        return elements
-
     def candyCrush(self, board):
         """
         :type board: List[List[int]]
         :rtype: List[List[int]]
         """
+        m = len(board)
+        n = len(board[0])
 
-        elements = self.get_crashing_elements(board)
+        def adjacent_elements(board):
+            s = set()
 
-        while elements:
-            for row, col in elements:
-                board[row][col] = 0
+            for i in range(1, m - 1):
+                for j in range(n):
+                    if board[i - 1][j] == board[i][j] == board[i + 1][j] != 0:
+                        s.add((i - 1, j))
+                        s.add((i, j))
+                        s.add((i + 1, j))
 
-            for j in range(len(board[0])):
-                i = len(board) - 1
+            for i in range(m):
+                for j in range(1, n - 1):
+                    if board[i][j - 1] == board[i][j] == board[i][j + 1] != 0:
+                        s.add((i, j - 1))
+                        s.add((i, j))
+                        s.add((i, j + 1))
+            return s
+
+        res = adjacent_elements(board)
+        while res:
+            for i, j in res:
+                board[i][j] = 0
+
+            for j in range(n):
+                i = m - 1
                 while i != 0:
-                    if i < len(board) and board[i][j] == 0 and board[i-1][j] != 0:
-                        buf = board[i-1][j]
-                        board[i-1][j] = 0
-                        board[i][j] = buf
+                    if i < m and board[i][j] == 0 and board[i - 1][j] != 0:
+                        board[i][j], board[i - 1][j] = board[i - 1][j], board[i][j]
                         i += 1
-                    else:
-                        i -= 1
+                        continue
 
-            elements = self.get_crashing_elements(board)
+                    i -= 1
+            res = adjacent_elements(board)
 
         return board
+
 
 class TestSolution(unittest.TestCase):
 
