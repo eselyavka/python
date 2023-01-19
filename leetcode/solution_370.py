@@ -2,6 +2,7 @@
 
 import unittest
 
+
 class Solution(object):
     def getModifiedArray(self, length, updates):
         """
@@ -9,17 +10,18 @@ class Solution(object):
         :type updates: List[List[int]]
         :rtype: List[int]
         """
-        arr = [0 for _ in range(length)]
+        ans = [0] * length
 
         for sidx, eidx, inc in updates:
-            arr[sidx] += inc
+            ans[sidx] += inc
             if eidx < length - 1:
-                arr[eidx+1] -= inc
+                ans[eidx + 1] -= inc
 
         for i in range(1, length):
-            arr[i] = arr[i] + arr[i-1]
+            ans[i] += ans[i - 1]
 
-        return arr
+        return ans
+
 
 class TestSolution(unittest.TestCase):
 
@@ -31,6 +33,7 @@ class TestSolution(unittest.TestCase):
 
         solution = Solution()
         self.assertEqual(solution.getModifiedArray(length, updates), [-2, 0, 3, 5, 3])
+
 
 if __name__ == '__main__':
     unittest.main()
