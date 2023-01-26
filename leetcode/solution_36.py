@@ -1,73 +1,56 @@
 #!/usr/bin/env python
 
 import unittest
-from collections import defaultdict
+
 
 class Solution(object):
-    def is_valid_num(self, num):
-        try:
-            num = int(num)
-            return 1 <= num <= 9
-        except ValueError:
-            if num == '.':
-                return True
-
-        return False
     def isValidSudoku(self, board):
         """
         :type board: List[List[str]]
         :rtype: bool
         """
-        d_row = defaultdict(set)
-        d_col = defaultdict(set)
-        sub_i = 1
-        setA = set()
-        setB = set()
-        setC = set()
-        for row in range(len(board)):
-            for col in range(len(board[row])):
-                num_row = board[row][col]
-                num_col = board[col][row]
-                if not self.is_valid_num(num_row) or num_row in d_row[row]:
+        row = col = len(board)
+
+        def is_unique_arr(arr):
+            return len(arr) == len(set(arr))
+
+        square1, square2, square3 = [], [], []
+        for i in range(row):
+            r = []
+            c = []
+            for j in range(col):
+                if board[i][j] != ".":
+                    r.append(board[i][j])
+                if board[j][i] != ".":
+                    c.append(board[j][i])
+
+                if j <= 2 and board[i][j] != ".":
+                    square1.append(board[i][j])
+                elif 2 < j <= 5 and board[i][j] != ".":
+                    square2.append(board[i][j])
+                elif 5 < j <= 8 and board[i][j] != ".":
+                    square3.append(board[i][j])
+
+            if i == 2:
+                if not is_unique_arr(square1) or not is_unique_arr(square2) or not is_unique_arr(square3):
                     return False
-                else:
-                    if num_row != '.':
-                        d_row[row].add(num_row)
-
-                if not self.is_valid_num(num_col) or num_col in d_col[row]:
+                square1, square2, square3 = [], [], []
+            if i == 5:
+                if not is_unique_arr(square1) or not is_unique_arr(square2) or not is_unique_arr(square3):
                     return False
-                else:
-                    if num_col != '.':
-                        d_col[row].add(num_col)
+                square1, square2, square3 = [], [], []
+            if i == 8:
+                if not is_unique_arr(square1) or not is_unique_arr(square2) or not is_unique_arr(square3):
+                    return False
+                square1, square2, square3 = [], [], []
 
-                if col // 3 == 0:
-                    if num_row in setA:
-                        return False
-                    else:
-                        if num_row != '.':
-                            setA.add(num_row)
-
-                if col // 3 == 1:
-                    if num_row in setB:
-                        return False
-                    else:
-                        if num_row != '.':
-                            setB.add(num_row)
-
-                if col // 3 == 2:
-                    if num_row in setC:
-                        return False
-                    else:
-                        if num_row != '.':
-                            setC.add(num_row)
-
-            if sub_i % 3 == 0:
-                setA.clear()
-                setB.clear()
-                setC.clear()
-            sub_i += 1
+            if not is_unique_arr(r):
+                return False
+            if not is_unique_arr(c):
+                return False
 
         return True
+
 
 class TestSolution(unittest.TestCase):
 
@@ -91,6 +74,7 @@ class TestSolution(unittest.TestCase):
         self.assertFalse(solution.isValidSudoku(sudoku1))
         sudoku1[4][6] = "3"
         self.assertFalse(solution.isValidSudoku(sudoku1))
+
 
 if __name__ == '__main__':
     unittest.main()
