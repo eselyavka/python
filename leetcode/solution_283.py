@@ -2,27 +2,21 @@
 
 import unittest
 
+
 class Solution(object):
     def moveZeroes(self, nums):
         """
         :type nums: List[int]
-        :rtype: void Do not return anything, modify nums in-place instead.
+        :rtype: None Do not return anything, modify nums in-place instead.
         """
-
-        i = 0
-        right = len(nums)
-        left = 0
-
-        while right > 0 and left < len(nums):
-            if nums[i] == 0:
-                nums.append(0)
-                del nums[i]
-                i = i-1 if i > 0 else 0
-                left += 1
-                continue
-
+        i, j = 0, 0
+        n = len(nums)
+        while i < n:
+            if nums[i] != 0:
+                nums[i], nums[j] = nums[j], nums[i]
+                j += 1
             i += 1
-            right -= 1
+
 
 class TestSolution(unittest.TestCase):
 
@@ -257,6 +251,7 @@ class TestSolution(unittest.TestCase):
                                  0,
                                  0,
                                  0])
+
 
 if __name__ == '__main__':
     unittest.main()
