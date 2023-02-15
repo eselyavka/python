@@ -11,27 +11,21 @@ class TreeNode(object):
 
 
 class Solution(object):
-    def __init__(self):
-        self.res = 0
-
     def goodNodes(self, root):
         """
         :type root: TreeNode
         :rtype: int
         """
+
         def rec(root, max_):
             if not root:
-                return
+                return 0
 
-            if root.val >= max_:
-                self.res += 1
+            return (1 if root.val >= max_ else 0) + rec(root.left,
+                                                        max(max_, root.val)) + rec(root.right,
+                                                                                   max(max_, root.val))
 
-            rec(root.left, max(max_, root.val))
-            rec(root.right, max(max_, root.val))
-
-        rec(root, root.val)
-
-        return self.res
+        return rec(root, root.val)
 
 
 class TestSolution(unittest.TestCase):
