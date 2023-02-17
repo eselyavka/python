@@ -2,48 +2,40 @@
 
 import unittest
 
+
 class MinStack(object):
 
     def __init__(self):
-        """
-        Initialize your data structure here.
-        """
         self.stack = []
-        self._min = None
+        self.min = []
 
-    def push(self, x):
+    def push(self, val):
         """
-        :type x: int
-        :rtype: void
+        :type val: int
+        :rtype: None
         """
-        self._min = min(self._min, x) if self._min is not None else x
-        self.stack.append(x)
+        self.stack.append(val)
+        self.min.append(val) if not self.min else self.min.append(min(val, self.min[-1]))
 
     def pop(self):
         """
-        :rtype: void
+        :rtype: None
         """
-        buf = self.stack.pop() if not self._is_empty() else None
-
-        if buf == self._min:
-            self._min = min(self.stack) if not self._is_empty() else None
+        _ = self.min.pop()
+        return self.stack.pop()
 
     def top(self):
         """
         :rtype: int
         """
-
-        return self.stack[-1] if not self._is_empty() else None
+        return self.stack[-1]
 
     def getMin(self):
         """
         :rtype: int
         """
+        return self.min[-1]
 
-        return self._min if not self._is_empty() else None
-
-    def _is_empty(self):
-        return len(self.stack) == 0
 
 class TestMinStack(unittest.TestCase):
 
@@ -61,9 +53,7 @@ class TestMinStack(unittest.TestCase):
         self.assertEqual(len(stack.stack), 1)
         self.assertEqual(stack.top(), -2)
         self.assertEqual(stack.getMin(), -2)
-        stack.pop()
-        self.assertIsNone(stack.getMin())
-        self.assertIsNone(stack.top())
+
 
 if __name__ == '__main__':
     unittest.main()
