@@ -2,17 +2,35 @@
 
 import unittest
 
+
 class Solution(object):
     def singleNonDuplicate(self, nums):
         """
         :type nums: List[int]
         :rtype: int
         """
-        for i in range(0, len(nums), 2):
-            idx1 = i+1 if i < len(nums) - 1 else i - 1
-            idx2 = i-1 if i > 0 else i + 1
-            if nums[i] != nums[idx1] and nums[i] != nums[idx2]:
-                return nums[i]
+
+        def binary_search(nums, l, r):
+            if l > r:
+                return -1
+
+            if l == r:
+                return nums[l]
+
+            mid = (l + r) // 2
+
+            if mid % 2 == 0:
+                if nums[mid] == nums[mid + 1]:
+                    return binary_search(nums, mid + 2, r)
+                return binary_search(nums, l, mid)
+
+            if nums[mid] == nums[mid - 1]:
+                return binary_search(nums, mid + 1, r)
+
+            return binary_search(nums, l, mid - 1)
+
+        return binary_search(nums, 0, len(nums) - 1)
+
 
 class TestSolution(unittest.TestCase):
 
@@ -28,6 +46,7 @@ class TestSolution(unittest.TestCase):
         self.assertEqual(solution.singleNonDuplicate(arr3), 2)
         self.assertEqual(solution.singleNonDuplicate(arr4), 2)
         self.assertEqual(solution.singleNonDuplicate(arr5), 2)
+
 
 if __name__ == '__main__':
     unittest.main()
