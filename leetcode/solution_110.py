@@ -2,41 +2,36 @@
 
 import unittest
 
+
 class TreeNode(object):
     def __init__(self, val):
         self.val = val
         self.left = None
         self.right = None
 
-class Solution(object):
-    def __init__(self):
-        self.flag = True
 
+class Solution(object):
     def isBalanced(self, root):
         """
         :type root: TreeNode
         :rtype: bool
         """
+        if not root:
+            return True
 
-        def rec(root):
+        def heigh(root):
             if not root:
                 return 0
 
-            left = rec(root.left)
-            right = rec(root.right)
+            return 1 + max(heigh(root.left), heigh(root.right))
 
-            if abs(left - right) > 1:
-                self.flag = False
+        left = heigh(root.left)
+        right = heigh(root.right)
 
-            if left > right:
-                return left + 1
+        ans = abs(left - right)
 
-            return right + 1
+        return ans < 2 and self.isBalanced(root.left) and self.isBalanced(root.right)
 
-
-        rec(root)
-
-        return self.flag
 
 class TestSolution(unittest.TestCase):
 
@@ -60,6 +55,7 @@ class TestSolution(unittest.TestCase):
         root.left.left.right = TreeNode(4)
 
         self.assertFalse(solution.isBalanced(root))
+
 
 if __name__ == '__main__':
     unittest.main()
