@@ -2,11 +2,13 @@
 
 import unittest
 
+
 class TreeNode(object):
     def __init__(self, val):
         self.val = val
         self.left = None
         self.right = None
+
 
 class Solution(object):
     def diameterOfBinaryTree(self, root):
@@ -35,6 +37,7 @@ class Solution(object):
 
         return max(left + right, max(left_diameter, right_diameter))
 
+
 class TestSolution(unittest.TestCase):
 
     def test_diameterOfBinaryTree(self):
@@ -59,8 +62,9 @@ class TestSolution(unittest.TestCase):
 
         solution = Solution()
 
-        self.assertEquals(solution.diameterOfBinaryTree(root), 3)
-        self.assertEquals(solution.diameterOfBinaryTree(root2), 8)
+        self.assertEqual(solution.diameterOfBinaryTree(root), 3)
+        self.assertEqual(solution.diameterOfBinaryTree(root2), 8)
+
 
 if __name__ == '__main__':
     unittest.main()
