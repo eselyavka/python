@@ -2,6 +2,7 @@
 
 import unittest
 
+
 class Solution(object):
     def splitArrayEqualSum(self, nums):
         """
@@ -18,6 +19,7 @@ class Solution(object):
 
         return []
 
+
 class TestSolution(unittest.TestCase):
     def test_splitArrayEqualSum(self):
         solution = Solution()
@@ -28,6 +30,7 @@ class TestSolution(unittest.TestCase):
         self.assertListEqual(solution.splitArrayEqualSum([5, 3]), [])
         self.assertListEqual(solution.splitArrayEqualSum([15, 16, 20, 12]), [])
         self.assertListEqual(solution.splitArrayEqualSum([1, 2, 3, 4, 5, 5]), [[1, 2, 3, 4], [5, 5]])
+
 
 if __name__ == '__main__':
     unittest.main()
