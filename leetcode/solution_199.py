@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import unittest
-from collections import deque, defaultdict
+from collections import defaultdict
 
 
 class TreeNode(object):
@@ -44,26 +44,27 @@ class Solution2(object):
         if not root:
             return []
 
-        q = deque([(root, 0)])
-
-        level_traversals = defaultdict(list)
+        q = [(0, root)]
+        d = defaultdict(list)
+        max_level = 0
 
         while q:
-            node, level = q.popleft()
-            level_traversals[level].append(node.val)
+            level, node = q[0]
+            max_level = max(max_level, level)
+            d[level].append(node.val)
 
             if node.left:
-                q.append((node.left, level+1))
-
+                q.append((level + 1, node.left))
             if node.right:
-                q.append((node.right, level+1))
+                q.append((level + 1, node.right))
 
-        res = []
+            q = q[1:]
 
-        for item in sorted(level_traversals.keys()):
-            res.append(level_traversals[item][-1])
+        ans = []
+        for level in range(max_level + 1):
+            ans.append(d[level][-1])
 
-        return res
+        return ans
 
 
 class TestSolution(unittest.TestCase):
