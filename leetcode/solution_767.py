@@ -2,43 +2,45 @@
 
 import unittest
 import heapq
+from collections import defaultdict
+
 
 class Solution(object):
-    def reorganizeString(self, S):
+    def reorganizeString(self, s):
         """
-        :type S: str
+        :type s: str
         :rtype: str
         """
-        if len(S) == 1:
-            return S
 
-        if len(S) == 2:
-            return S if len(S) == len(set(S)) else ''
+        freqs = defaultdict(int)
 
-        d, pq = dict(), []
+        for c in s:
+            freqs[c] -= 1
 
-        for c in S:
-            if d.get(c):
-                d[c] += -1
-            else:
-                d[c] = -1
+        h = []
+        for c, freq in freqs.items():
+            heapq.heappush(h, (freq, c))
 
-        for x in d.iteritems():
-            heapq.heappush(pq, [x[1], x[0]])
+        ans = ""
+        prev = None
 
-        prev, res = None, ''
+        while h or prev:
+            if not h and prev:
+                return ""
 
-        while pq:
-            curr = heapq.heappop(pq)
-            res += curr[1]
-            curr[0] += 1
+            freq, c = heapq.heappop(h)
+            ans += c
+            freq += 1
 
-            if prev and prev[0] < 0:
-                heapq.heappush(pq, prev)
+            if prev:
+                heapq.heappush(h, prev)
+                prev = None
 
-            prev = curr
+            if freq != 0:
+                prev = (freq, c)
 
-        return res if len(res) == len(S) else ''
+        return ans
+
 
 class TestSolution(unittest.TestCase):
     def test_reorganizeString(self):
@@ -52,6 +54,7 @@ class TestSolution(unittest.TestCase):
         self.assertEqual(solution.reorganizeString("aaab"), "")
         self.assertEqual(solution.reorganizeString("vvvlo"), "vlvov")
         self.assertEqual(solution.reorganizeString("blflxll"), "lblflxl")
+
 
 if __name__ == '__main__':
     unittest.main()
