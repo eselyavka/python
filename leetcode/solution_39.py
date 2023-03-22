@@ -3,7 +3,7 @@
 import unittest
 
 
-class Solution(object):
+class Solution2(object):
     def combinationSum(self, candidates, target):
         """
         :type candidates: List[int]
@@ -38,11 +38,48 @@ class Solution(object):
         return res
 
 
+class Solution(object):
+    def combinationSum(self, candidates, target):
+        """
+        :type candidates: List[int]
+        :type target: int
+        :rtype: List[List[int]]
+        """
+
+        def backtracking(target, idx, local_ans, ans):
+            local_sum = sum(local_ans)
+
+            if idx >= len(candidates) or local_sum > target:
+                return
+
+            if local_sum == target:
+                ans.append(local_ans[:])
+                return
+
+            local_ans.append(candidates[idx])
+
+            backtracking(target, idx, local_ans, ans)
+
+            local_ans.pop()
+
+            backtracking(target, idx + 1, local_ans, ans)
+
+        local_ans = []
+        ans = []
+
+        backtracking(target, 0, local_ans, ans)
+
+        return ans
+
+
 class TestSolution(unittest.TestCase):
 
     def test_combinationSum(self):
         solution = Solution()
-        self.assertListEqual(solution.combinationSum([2, 3, 6, 7], 7), [[7], [2, 2, 3]])
+        self.assertListEqual(sorted(solution.combinationSum([2, 3, 6, 7], 7)), sorted([[7], [2, 2, 3]]))
+
+        solution2 = Solution2()
+        self.assertListEqual(sorted(solution2.combinationSum([2, 3, 6, 7], 7)), sorted([[7], [2, 2, 3]]))
 
 
 if __name__ == '__main__':
