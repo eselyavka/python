@@ -7,7 +7,9 @@ class Solution(object):
         :type nums: List[int]
         :rtype: int
         """
-        if len(nums) == 0:
+        n = len(nums)
+
+        if n == 1:
             return 0
 
         max_pos = None
@@ -24,7 +26,6 @@ class Solution(object):
                 min_pos = idx, num
                 min_ = num
 
-        n = len(nums)
         i = max_pos[0] + 1
         ans = 0
         while i < n:
