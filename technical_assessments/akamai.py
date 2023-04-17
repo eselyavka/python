@@ -6,13 +6,15 @@
 
 import unittest
 
+
 class Solution(object):
     def __init__(self):
         self.network = '10.10.0.'
-        self.hosts_in_network = [self.network+str(host) for host in range(1, 63)]
+        self.hosts_in_network = [self.network + str(host) for host in range(1, 63)]
 
     def is_belong(self, host):
         return host in self.hosts_in_network
+
 
 class TestSolution(unittest.TestCase):
 
@@ -30,5 +32,7 @@ class TestSolution(unittest.TestCase):
                                                                              '192.168.0.1',
                                                                              '8.8.8.8',
                                                                              '127.0.0.1']])
+
+
 if __name__ == '__main__':
     unittest.main()
