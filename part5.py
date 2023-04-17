@@ -6,6 +6,7 @@ Exercises from partVI Learning Python, Fifth Edition by Mark Lutz
 import unittest
 import copy
 
+
 class Adder(object):
     def __init__(self, data=None):
         self.data = data
@@ -16,16 +17,19 @@ class Adder(object):
     def add(self, x, y):
         raise NotImplementedError
 
+
 class ListAdder(Adder):
     def add(self, x, y):
         if all([isinstance(x, list), isinstance(y, list)]):
-            return x+y
+            return x + y
+
 
 class DictAdder(Adder):
     def add(self, x, y):
         if all([isinstance(x, dict), isinstance(y, dict)]):
             x.update(y)
             return x
+
 
 class MyList(list):
     def __init__(self, data=None):
@@ -54,6 +58,7 @@ class MyList(list):
     def __getattr__(self, name):
         return getattr(self.data, name)
 
+
 class MyListSub(MyList):
     _counter = 0
 
@@ -62,23 +67,25 @@ class MyListSub(MyList):
         MyList.__init__(self, *args, **kwargs)
 
     def __add__(self, other):
-        print 'call to __add__'
+        print("call to __add__")
         self.adds += 1
         MyListSub._counter += 1
         return MyList.__add__(self, other)
 
     def _get_counters(self):
-        return (self._counter, self.adds)
+        return self._counter, self.adds
+
 
 class Attrs(object):
 
     def __getattr__(self, name):
-        print 'fetching attribute {0}'.format(name)
-        return self.__dict__[name] if self.__dict__.has_key(name) else None
+        print("fetching attribute {0}".format(name))
+        return self.__dict__.get(name)
 
     def __setattr__(self, name, value):
-        print 'set attribute {0} with value {1}'.format(name, value)
+        print("set attribute {0} with value {1}".format(name, value))
         self.__dict__[name] = value
+
 
 def nested_traversals(struct, payload):
     if any([isinstance(struct, stype) for stype in [list, dict, set]]):
@@ -86,6 +93,7 @@ def nested_traversals(struct, payload):
             nested_traversals(element, payload)
     else:
         payload.add(struct)
+
 
 class MySet(set):
 
@@ -102,14 +110,15 @@ class MySet(set):
         return set(self._union)
 
     def intersect(self, *args):
-        next_set=set()
-        previous_set=set()
-        result=list()
+        next_set = set()
+        previous_set = set()
+        result = list()
         for arg in args:
             nested_traversals(arg, next_set)
             result.append(next_set & previous_set)
-            previous_set=next_set
+            previous_set = next_set
         return set(result)
+
 
 class Lunch(object):
     def __init__(self):
@@ -122,6 +131,7 @@ class Lunch(object):
     def result(self):
         return self.customer.getFood()
 
+
 class Customer(object):
     def __init__(self):
         self.my_food = None
@@ -132,13 +142,16 @@ class Customer(object):
     def getFood(self):
         return self.my_food.name
 
+
 class Employee(object):
     def takeFood(self, foodName):
         return Food(foodName)
 
+
 class Food(object):
     def __init__(self, name):
         self.name = name
+
 
 class TestAssigment(unittest.TestCase):
     def setUp(self):
@@ -157,13 +170,13 @@ class TestAssigment(unittest.TestCase):
         self.assertEqual(ListAdder([4]) + [1, 2, 3], [4, 1, 2, 3])
 
     def test_list_dict(self):
-        self.assertIsNone(self.dictAdder.add({'key1':1, 'key2':2, 'key3':3}, 'aaa'))
-        self.assertIsNone(self.dictAdder.add({'key1':1, 'key2':2, 'key3':3}, 1))
-        self.assertEqual(self.dictAdder.add({'key1':1, 'key2':2, 'key3':3}, {'key':4}),
-                         {'key1':1, 'key2':2, 'key3':3, 'key':4})
-        self.assertIsNone(DictAdder(10) + {'key1':1, 'key2':2, 'key3':3})
-        self.assertEqual(DictAdder({'key':4}) + {'key1':1, 'key2':2, 'key3':3},
-                         {'key1':1, 'key2':2, 'key3':3, 'key':4})
+        self.assertIsNone(self.dictAdder.add({'key1': 1, 'key2': 2, 'key3': 3}, 'aaa'))
+        self.assertIsNone(self.dictAdder.add({'key1': 1, 'key2': 2, 'key3': 3}, 1))
+        self.assertEqual(self.dictAdder.add({'key1': 1, 'key2': 2, 'key3': 3}, {'key': 4}),
+                         {'key1': 1, 'key2': 2, 'key3': 3, 'key': 4})
+        self.assertIsNone(DictAdder(10) + {'key1': 1, 'key2': 2, 'key3': 3})
+        self.assertEqual(DictAdder({'key': 4}) + {'key1': 1, 'key2': 2, 'key3': 3},
+                         {'key1': 1, 'key2': 2, 'key3': 3, 'key': 4})
 
     def test_my_list(self):
         self.assertIsNone(MyList(10) + [1, 2, 3])
@@ -190,10 +203,11 @@ class TestAssigment(unittest.TestCase):
         self.assertIsNone(getattr(self.my_attrs, 'inexistent'))
 
     def test_my_set(self):
-        self.assertEqual(MySet(1,2,3,['ddd',1,'www'], 'mmm'), set([1,2,3,'ddd','www','mmm']))
-        result = MySet(1,2,3) & MySet(4,1) & MySet(1,50)
-        self.assertEqual(result, set([1]))
-        self.assertEqual(MySet(1).union(MySet([2,3,'ddd', 1, 'www']), MySet('mmm')), set([1,2,3,'ddd','www','mmm']))
+        self.assertEqual(MySet(1, 2, 3, ['ddd', 1, 'www'], 'mmm'), {1, 2, 3, 'ddd', 'www', 'mmm'})
+        result = MySet(1, 2, 3) & MySet(4, 1) & MySet(1, 50)
+        self.assertEqual(result, {1})
+        self.assertEqual(MySet(1).union(MySet([2, 3, 'ddd', 1, 'www']), MySet('mmm')),
+                         {1, 2, 3, 'ddd', 'www', 'mmm'})
 
     def test_composition(self):
         x = Lunch()
@@ -201,6 +215,7 @@ class TestAssigment(unittest.TestCase):
         self.assertEqual(x.result(), 'burritos')
         x.order('pizza')
         self.assertEqual(x.result(), 'pizza')
+
 
 if __name__ == '__main__':
     unittest.main()
