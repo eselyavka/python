@@ -9,56 +9,56 @@ class Solution(object):
         :type n: int
         :rtype: List[List[int]]
         """
-        if n == 1:
-            return [[1]]
+        ans = [[0] * n for _ in range(n)]
 
-        row = col = n - 1
-        res = [[float('-inf')]*n for _ in range(n)]
-        element = 1
-        x = y = init_x = init_y = 0
+        i = 2
 
-        while True:
-            if x >= n or y >= n:
-                break
+        prev_x = 0
+        prev_y = 0
+        ans[prev_x][prev_y] = 1
 
-            if res[x][y] == float('-inf'):
-                res[x][y] = element
-
+        while i <= n ** 2:
             # right
-            while y < col:
-                y += 1
-                element += 1
-                if res[x][y] == float('-inf'):
-                    res[x][y] = element
-
+            while True:
+                new_x = min(prev_x, n - 1)
+                new_y = min(prev_y + 1, n - 1)
+                if ans[new_x][new_y] == 0:
+                    ans[new_x][new_y] = i
+                    i += 1
+                    prev_x, prev_y = new_x, new_y
+                else:
+                    break
             # down
-            while x < row:
-                x += 1
-                element += 1
-                if res[x][y] == float('-inf'):
-                    res[x][y] = element
-
-            # left
-            while y > init_y:
-                y -= 1
-                element += 1
-                if res[x][y] == float('-inf'):
-                    res[x][y] = element
+            while True:
+                new_x = min(prev_x + 1, n - 1)
+                new_y = min(prev_y, n - 1)
+                if ans[new_x][new_y] == 0:
+                    ans[new_x][new_y] = i
+                    i += 1
+                    prev_x, prev_y = new_x, new_y
+                else:
+                    break
+                    # left
+            while True:
+                new_x = min(prev_x, n - 1)
+                new_y = min(prev_y - 1, n - 1)
+                if ans[new_x][new_y] == 0:
+                    ans[new_x][new_y] = i
+                    i += 1
+                    prev_x, prev_y = new_x, new_y
+                else:
+                    break
             # up
-            while x > init_x:
-                x -= 1
-                element += 1
-                if res[x][y] == float('-inf'):
-                    res[x][y] = element
-
-            init_x += 1
-            init_y += 1
-            x = init_x
-            y = init_y
-            row -= 1
-            col -= 1
-
-        return res
+            while True:
+                new_x = min(prev_x - 1, n - 1)
+                new_y = min(prev_y, n - 1)
+                if ans[new_x][new_y] == 0:
+                    ans[new_x][new_y] = i
+                    i += 1
+                    prev_x, prev_y = new_x, new_y
+                else:
+                    break
+        return ans
 
 
 class TestSolution(unittest.TestCase):
