@@ -41,7 +41,7 @@ class Solution(object):
                     # left
             while True:
                 new_x = min(prev_x, n - 1)
-                new_y = min(prev_y - 1, n - 1)
+                new_y = max(prev_y - 1, 0)
                 if ans[new_x][new_y] == 0:
                     ans[new_x][new_y] = i
                     i += 1
@@ -50,7 +50,7 @@ class Solution(object):
                     break
             # up
             while True:
-                new_x = min(prev_x - 1, n - 1)
+                new_x = max(prev_x - 1, 0)
                 new_y = min(prev_y, n - 1)
                 if ans[new_x][new_y] == 0:
                     ans[new_x][new_y] = i
