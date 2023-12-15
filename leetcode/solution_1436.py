@@ -1,5 +1,4 @@
 import unittest
-from collections import defaultdict
 
 
 class Solution(object):
@@ -8,7 +7,7 @@ class Solution(object):
         :type paths: List[List[str]]
         :rtype: str
         """
-        G = defaultdict(list)
+        G = {}
 
         for start, end in paths:
             G[start] = end
