@@ -6,24 +6,20 @@ class TreeNode(object):
         self.left = None
         self.right = None
 
+
 class Solution(object):
     def invertTree(self, root):
         """
-        :type root: TreeNode
-        :rtype: TreeNode
+        :type root: Optional[TreeNode]
+        :rtype: Optional[TreeNode]
         """
         if root is None:
-            return
+            return None
 
-        self.invertTree(root.right)
-        self.invertTree(root.left)
-
-        buf = root.right
-
-        root.right = root.left
-        root.left = buf
+        root.left, root.right = self.invertTree(root.right), self.invertTree(root.left)
 
         return root
+    
 
 def print_preorder(root):
     if root:
@@ -31,8 +27,8 @@ def print_preorder(root):
         print_preorder(root.left)
         print_preorder(root.right)
 
-if __name__ == '__main__':
 
+if __name__ == '__main__':
     root = TreeNode(4)
     root.left = TreeNode(2)
     root.left.left = TreeNode(1)
