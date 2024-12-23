@@ -27,9 +27,10 @@ class Solution(object):
             invert(root1.left, root2.right, level + 1)
             invert(root1.right, root2.left, level + 1)
 
-            return root
+        if root.left and root.right:
+            invert(root.left, root.right, 0)
 
-        return invert(root.left, root.right, 0) if root.left and root.right else root
+        return root
 
 
 class TestSolution(unittest.TestCase):
