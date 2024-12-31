@@ -10,18 +10,19 @@ class Solution(object):
         :type costs: List[int]
         :rtype: int
         """
-        dp = [0] * 366
+        max_day = max(days) + 1
+        dp = [0] * max_day
         days_set = set(days)
 
-        for day in range(1, 366):
+        for day in range(1, max_day):
             if day in days_set:
-                dp[day] = min(dp[day-1] + costs[0],
-                              dp[max(0, day-7)] + costs[1],
-                              dp[max(0, day-30)] + costs[2])
+                dp[day] = min(dp[day - 1] + costs[0],
+                              dp[max(0, day - 7)] + costs[1],
+                              dp[max(0, day - 30)] + costs[2])
             else:
-                dp[day] = dp[day-1]
+                dp[day] = dp[day - 1]
 
-        return dp[365]
+        return dp[-1]
 
 
 class TestSolution(unittest.TestCase):
