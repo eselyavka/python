@@ -4,32 +4,31 @@ import unittest
 
 
 class Solution(object):
-    def __init__(self):
-        self.cnt = 0
-        self.res = ''
-
     def getHappyString(self, n, k):
         """
         :type n: int
         :type k: int
         :rtype: str
         """
-        arr = ['a', 'b', 'c']
+        res = []
 
-        def rec(arr, target, curr, n, k):
-            if len(target) == n:
-                if self.cnt == k-1:
-                    self.res = target
-                self.cnt += 1
+        def generate_permutations(chars, n, current=""):
+            if n == 0:
+                res.append(current)
                 return
-            for c in arr:
-                if c == curr:
-                    continue
-                rec(arr, target + c, c, n, k)
 
-        rec(arr, '', '', n, k)
+            for char in chars:
+                if not current or current[-1] != char:
+                    generate_permutations(chars, n - 1, current + char)
 
-        return self.res
+        generate_permutations(['a', 'b', 'c'], n)
+
+        res.sort()
+
+        if k > len(res):
+            return ""
+
+        return res[k - 1]
 
 
 class TestSolution(unittest.TestCase):
