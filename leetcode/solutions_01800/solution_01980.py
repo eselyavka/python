@@ -9,14 +9,21 @@ class Solution(object):
         :type nums: List[str]
         :rtype: str
         """
-        ans = []
+        self.ans = ""
+        self.found = False
+
         seen = set(nums)
 
         def generate_permutations(chars, n, current=""):
+            if self.found:
+                return
+
             if n == 0:
                 if current not in seen:
-                    ans.append(current)
+                    self.ans = current
+                    self.found = True
                 return
+
             for char in chars:
                 generate_permutations(chars, n - 1, current + char)
 
@@ -24,7 +31,7 @@ class Solution(object):
 
         generate_permutations(["0", "1"], n)
 
-        return "" if not ans else ans.pop()
+        return self.ans
 
 
 class TestSolution(unittest.TestCase):
