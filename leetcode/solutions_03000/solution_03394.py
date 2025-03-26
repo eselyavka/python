@@ -30,7 +30,7 @@ class Solution(object):
         return res_vert >= 2 or res_hor >= 2
 
 
-class MyTestCase(unittest.TestCase):
+class TestSolution(unittest.TestCase):
     def test_checkValidCuts(self):
         solution = Solution()
         self.assertTrue(solution.checkValidCuts(5, [[1, 0, 5, 2], [0, 2, 2, 4], [3, 2, 5, 3], [0, 4, 4, 5]]))
