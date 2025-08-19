@@ -27,10 +27,30 @@ class Solution(object):
         return ans
 
 
+class Solution2(object):
+    def zeroFilledSubarray(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        ans, num_subarr = 0, 0
+        for num in nums:
+            if num == 0:
+                num_subarr += 1
+            else:
+                num_subarr = 0
+
+            ans += num_subarr
+
+        return ans
+
+
 class TestSolution(unittest.TestCase):
     def test_zeroFilledSubarray(self):
         solution = Solution()
         self.assertEqual(solution.zeroFilledSubarray([1, 3, 0, 0, 2, 0, 0, 4]), 6)
+        solution2 = Solution2()
+        self.assertEqual(solution2.zeroFilledSubarray([1, 3, 0, 0, 2, 0, 0, 4]), 6)
 
 
 if __name__ == '__main__':
