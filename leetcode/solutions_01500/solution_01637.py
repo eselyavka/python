@@ -9,16 +9,9 @@ class Solution(object):
         :type points: List[List[int]]
         :rtype: int
         """
-        arr = []
-        for p in points:
-            arr.append(p[0])
-        arr.sort()
+        points.sort()
 
-        res = 0
-        for i in range(1, len(arr)):
-            res = max(res, arr[i]-arr[i-1])
-
-        return res
+        return max(points[i][0] - points[i - 1][0] for i in range(1, len(points)))
 
 
 class TestSolution(unittest.TestCase):
