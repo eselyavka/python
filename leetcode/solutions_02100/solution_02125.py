@@ -31,10 +31,36 @@ class Solution(object):
         return ans
 
 
+class Solution2(object):
+    def numberOfBeams(self, bank):
+        """
+        :type bank: List[str]
+        :rtype: int
+        """
+
+        prev_row_dev_cnt = 0
+        ans = 0
+        for row in bank:
+            running_dev_cnt = 0
+            no_beams = True
+            for c in row:
+                if c == "1":
+                    no_beams = False
+                    running_dev_cnt += 1
+                    ans += prev_row_dev_cnt
+            if not no_beams:
+                prev_row_dev_cnt = running_dev_cnt
+
+        return ans
+
+
 class TestSolution(unittest.TestCase):
     def test_numberOfBeams(self):
         solution = Solution()
         self.assertEqual(solution.numberOfBeams(["011001", "000000", "010100", "001000"]), 8)
+        
+        solution2 = Solution2()
+        self.assertEqual(solution2.numberOfBeams(["011001", "000000", "010100", "001000"]), 8)
 
 
 if __name__ == '__main__':
