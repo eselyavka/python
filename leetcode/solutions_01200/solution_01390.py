@@ -1,35 +1,34 @@
 #!/usr/bin/env python
-
+import math
 import unittest
 
 
 class Solution(object):
     def sumFourDivisors(self, nums):
-        """
-        :type nums: List[int]
-        :rtype: int
-        """
-        def divisors(n):
-            divisors = [1, n]
-            i = 2
-            while i ** 2 <= n:
-                if len(divisors) > 4:
-                    return []
-                if n % i == 0:
-                    if n / i != i:
-                        divisors.extend([i, n / i])
+        ans = 0
+
+        for num in nums:
+            cnt = 2
+            s = 1 + num
+            limit = int(math.sqrt(num))
+
+            for d in range(2, limit + 1):
+                if num % d == 0:
+                    other = num // d
+                    if other == d:
+                        cnt += 1
+                        s += d
                     else:
-                        divisors.append(n/i)
-                i += 1
+                        cnt += 2
+                        s += d + other
 
-            return divisors if len(divisors) == 4 else []
+                    if cnt > 4:
+                        break
 
-        res = 0
-        for n in nums:
-            divisors_ = divisors(n)
-            res += sum(divisors_) if divisors_ else 0
+            if cnt == 4:
+                ans += s
 
-        return res
+        return ans
 
 
 class TestSolution(unittest.TestCase):
