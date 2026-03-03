@@ -1,0 +1,61 @@
+#!/usr/bin/env python3
+
+"""LeetCode solution 02348."""
+
+import unittest
+
+
+class Solution(object):
+    def zeroFilledSubarray(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        ans = 0
+        m = len(nums)
+        i = 0
+
+        while i < m:
+            if nums[i] == 0:
+                n = 0
+                k = i
+                while k < len(nums) and nums[k] == 0:
+                    n += 1
+                    k += 1
+
+                ans += (n * (n + 1)) // 2
+                i = k
+                continue
+            i += 1
+
+        return ans
+
+
+class Solution2(object):
+    def zeroFilledSubarray(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        ans, num_subarr = 0, 0
+        for num in nums:
+            if num == 0:
+                num_subarr += 1
+            else:
+                num_subarr = 0
+
+            ans += num_subarr
+
+        return ans
+
+
+class TestSolution(unittest.TestCase):
+    def test_zeroFilledSubarray(self):
+        solution = Solution()
+        self.assertEqual(solution.zeroFilledSubarray([1, 3, 0, 0, 2, 0, 0, 4]), 6)
+        solution2 = Solution2()
+        self.assertEqual(solution2.zeroFilledSubarray([1, 3, 0, 0, 2, 0, 0, 4]), 6)
+
+
+if __name__ == '__main__':
+    unittest.main()

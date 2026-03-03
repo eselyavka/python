@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 """
 Validate if a given string is a numeric.
 """

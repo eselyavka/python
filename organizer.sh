@@ -2,8 +2,8 @@
 
 set -Ce
 
-SOURCE_DIR="leetcode"
-DEST_DIR="leetcode"
+SOURCE_DIR="practice/leetcode"
+DEST_DIR="practice/leetcode"
 
 mkdir -p "$DEST_DIR"
 

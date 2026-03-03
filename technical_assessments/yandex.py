@@ -1,9 +1,13 @@
+#!/usr/bin/env python3
+
+"""Module for technical_assessments.yandex."""
+
 import re
 
 
 # Task1
 def toDict(inKey, inValues):
-    return dict(map(inKey, inValues))
+    return dict(list(map(inKey, inValues)))
 
 
 # Task2
@@ -63,16 +67,17 @@ def shellExample2():
 
 
 def pythonExample():
-    freq = dict()
+    freq = {}
     with(open('access.log', 'r')) as lines:
         for l in lines:
-            if freq.has_key(l.split(' ')[0]):
+            if l.split(' ')[0] in freq:
                 freq[l.split(' ')[0]] += 1
             else:
                 freq[l.split(' ')[0]] = 1
 
     i = 0
     for ip in sorted(freq, key=freq.__getitem__, reverse=True):
-        print(ip + ' ' + str(freq[ip]))
-        if i == 9: break
+        print((ip + ' ' + str(freq[ip])))
+        if i == 9:
+            break
         i += 1

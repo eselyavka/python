@@ -1,0 +1,37 @@
+[MASTER]
+jobs=0
+ignore=.git,__pycache__
+persistent=no
+
+[MESSAGES CONTROL]
+disable=
+    missing-module-docstring,
+    missing-class-docstring,
+    missing-function-docstring,
+    invalid-name,
+    too-few-public-methods,
+    useless-object-inheritance,
+    no-else-return,
+    inconsistent-return-statements,
+    consider-using-dict-items,
+    consider-using-in,
+    use-a-generator,
+    line-too-long,
+    unspecified-encoding,
+    duplicate-code
+
+[FORMAT]
+max-line-length=100
+
+[TYPECHECK]
+ignored-modules=
+    flask,
+    requests,
+    psycopg2,
+    mysql,
+    mysql.connector,
+    avro,
+    flumelogger,
+    bs4,
+    hbase,
+    thrift

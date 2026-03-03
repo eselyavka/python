@@ -1,21 +1,21 @@
-#!/usr/bin/env python
-""" Unit test for is_word_polindrome.py """
+#!/usr/bin/env python3
 
+"""Unit tests for is_word_palindrome.py."""
+
+from pathlib import Path
 import unittest
-import sys
 
-sys.path.insert(0, '../')
-from is_word_palindrome import solution, solution_reversed, solution_slice
+from src.is_word_palindrome import solution, solution_reversed, solution_slice
 
 class TestCountFunctions(unittest.TestCase):
-    """ Unit test for is_word_polindrome.py """
+    """Unit tests for palindrome helpers."""
 
     def setUp(self):
-        self.lines = open('palindromes.txt', 'r').readlines()
+        self.lines = Path(__file__).with_name('palindromes.txt').read_text().splitlines()
 
     def test_solutions(self):
         for sol in [solution, solution_reversed, solution_slice]:
-            self.assertTrue(all([sol(word) for word in self.lines]))
+            self.assertTrue(all(sol(word) for word in self.lines))
             self.assertFalse(sol('notapalindrom'))
             self.assertFalse(sol('definitelynotpalindrome'))
             self.assertFalse(sol("shouldn'tpasseither"))

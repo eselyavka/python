@@ -1,16 +1,15 @@
-#!/usr/bin/env python
-""" Unit test for mymod.py """
+#!/usr/bin/env python3
 
-import unittest
+"""Unit tests for mymod.py."""
+
 import os.path
 import tempfile
-import sys
+import unittest
 
-sys.path.insert(0, '../')
-import mymod
+from src import mymod
 
 class TestCountFunctions(unittest.TestCase):
-    """ Unit test for mymod.py """
+    """Unit tests for mymod.py."""
 
     tmpfilepath = os.path.join(tempfile.gettempdir(), "testfile")
 

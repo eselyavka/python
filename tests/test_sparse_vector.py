@@ -1,14 +1,13 @@
-#!/usr/bin/env python
-""" Unit test for sparse_vector.py """
+#!/usr/bin/env python3
+
+"""Unit tests for sparse_vector.py."""
 
 import unittest
-import sys
 
-sys.path.insert(0, '../')
-from sparse_vector import SparseVector
+from src.sparse_vector import SparseVector
 
 class TestSparseVector(unittest.TestCase):
-    """ Unit test for sparse_vector.py """
+    """Unit tests for sparse_vector.py."""
 
     def setUp(self):
         self.sparse_vector = SparseVector(10)
@@ -35,7 +34,7 @@ class TestSparseVector(unittest.TestCase):
 
     def test_dot(self):
         self._put()
-        self.assertEqual(float("{0:.5f}".format(self.sparse_vector.dot(self.that))),
+        self.assertEqual(float(f"{self.sparse_vector.dot(self.that):0.5f}"),
                          0.20984)
 
 if __name__ == '__main__':
