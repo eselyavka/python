@@ -6,6 +6,7 @@ ROOT_DIR="$(git rev-parse --show-toplevel)"
 cd "$ROOT_DIR"
 
 PYTHON_BIN="${PYTHON_BIN:-$HOME/.venv/py3_11/bin/python}"
+PYLINT_FAIL_UNDER="${PYLINT_FAIL_UNDER:-10.0}"
 
 if [[ ! -x "$PYTHON_BIN" ]]; then
     echo "Missing Python interpreter: $PYTHON_BIN" >&2
@@ -75,4 +76,4 @@ if [[ ${#NEW_PYTHON_FILES[@]:-0} -eq 0 ]]; then
 fi
 
 echo "Running pylint on newly added Python files..."
-"$PYTHON_BIN" -m pylint --jobs=1 "${NEW_PYTHON_FILES[@]}"
+"$PYTHON_BIN" -m pylint --jobs=1 --fail-under="$PYLINT_FAIL_UNDER" "${NEW_PYTHON_FILES[@]}"

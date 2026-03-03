@@ -9,6 +9,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      PYLINT_FAIL_UNDER: "10.0"
     strategy:
       matrix:
         python-version: ["3.10", "3.11"]
@@ -48,7 +50,7 @@ jobs:
     - name: Analyse newly added Python files with pylint
       if: steps.added-python.outputs.files != ''
       run: |
-        pylint --jobs=1 ${{ steps.added-python.outputs.files }}
+        pylint --jobs=1 --fail-under="$PYLINT_FAIL_UNDER" ${{ steps.added-python.outputs.files }}
     - name: Skip pylint when no new Python files were added
       if: steps.added-python.outputs.files == ''
       run: |
