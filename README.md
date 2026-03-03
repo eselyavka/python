@@ -51,6 +51,11 @@ python3 -m pytest
 Git commits use the tracked hook in `.githooks/pre-commit`.
 It runs `pytest` for the full repo and `pylint` for newly added staged Python files.
 By default the hook uses `~/.venv/py3_11/bin/python`; override with `PYTHON_BIN=/path/to/python` if needed.
+Enable it in a fresh clone with:
+
+```bash
+git config core.hooksPath .githooks
+```
 
 If you want to run the reporter project against real HTTP endpoints, install `requests` first.
 
