@@ -1,4 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
+
+"""Module for technical_assessments.akamai."""
 
 # Check if host belong to specific network,
 # network and broadcast addresses are not included

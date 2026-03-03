@@ -1,4 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
+
+"""Module for technical_assessments.facebook."""
 
 # open two csv files with format nameX,numberX | nameY,numberY
 # sort both files by X,Y and produce name
@@ -42,8 +44,13 @@ class Solution(object):
             else:
                 data_dict[number] = [name]
 
+    @staticmethod
+    def process_file(payload, data_dict):
+        """Populate a number-to-names mapping from CSV-like rows."""
+        Solution._process_file(payload, data_dict)
+
     def sort_by_number(self):
-        numbered_names = dict()
+        numbered_names = {}
         with open(self.file1, 'r') as fh1, open(self.file2, 'r') as fh2:
             Solution._process_file(fh1.readlines(), numbered_names)
             Solution._process_file(fh2.readlines(), numbered_names)
@@ -69,9 +76,9 @@ class TestSolution(unittest.TestCase):
 
     def test_process_file(self):
         solution = Solution(self.file1, self.file2)
-        actual = dict()
-        solution._process_file(self.file1.readlines(), actual)
-        solution._process_file(self.file2.readlines(), actual)
+        actual = {}
+        solution.process_file(self.file1.readlines(), actual)
+        solution.process_file(self.file2.readlines(), actual)
         expected = {83: ['name1'], 12: ['name2', 'name5'], 101: ['name3'],
                     53: ['name4'], 1101: ['name6']}
         self.assertEqual(actual, expected)

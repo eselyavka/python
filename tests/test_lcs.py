@@ -1,14 +1,13 @@
-#!/usr/bin/env python
-""" Unit test for lcs.py """
+#!/usr/bin/env python3
+
+"""Unit tests for lcs.py."""
 
 import unittest
-import sys
 
-sys.path.insert(0, '../')
-from lcs import lcs, recursion_lcs
+from src.lcs import lcs, recursion_lcs
 
 class TestSparseVector(unittest.TestCase):
-    """ Unit test for sparse_vector.py """
+    """Unit tests for lcs.py."""
 
     def setUp(self):
         self.seq1 = 'ABCDGH'

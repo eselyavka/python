@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "python-workspace"
+version = "0.1.0"
+description = "Reorganized Python workspace with active modules, projects, practice code, and archived scripts."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+reporter = ["requests>=2.31"]
+avro = ["avro>=1.11,<2"]
+avro-send = ["flumelogger==0.4.3"]
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src", "src.*", "projects", "projects.*", "technical_assessments", "technical_assessments.*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests", "projects/reporter/test_status_reporter.py", "practice/algorithms", "technical_assessments", "practice/leetcode"]
+python_files = ["test_*.py", "*.py"]
+norecursedirs = [".git", "archive"]
+addopts = "-ra --ignore=projects/reporter/app --ignore=projects/reporter/app_srv.py"

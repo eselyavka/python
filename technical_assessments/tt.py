@@ -1,4 +1,7 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
+
+"""Module for technical_assessments.tt"""
+
 import random
 
 SIZE = 9

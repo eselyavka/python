@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+ROOT_DIR="$(git rev-parse --show-toplevel)"
+cd "$ROOT_DIR"
+
+PYTHON_BIN="${PYTHON_BIN:-$HOME/.venv/py3_11/bin/python}"
+
+if [[ ! -x "$PYTHON_BIN" ]]; then
+    echo "Missing Python interpreter: $PYTHON_BIN" >&2
+    echo "Set PYTHON_BIN to a valid interpreter before committing." >&2
+    exit 1
+fi
+
+declare -a STAGED_NEW_FILES=()
+while IFS= read -r -d '' file; do
+    STAGED_NEW_FILES+=("$file")
+done < <(git diff --cached --name-only --diff-filter=AR -z)
+
+validate_leetcode_filenames() {
+    local invalid=0
+    local package_init='practice/leetcode/__init__.py'
+    local solution_pattern='^practice/leetcode/solutions_[0-9]{5}/solution_[0-9]{5}\.py$'
+    local init_pattern='^practice/leetcode/solutions_[0-9]{5}/__init__\.py$'
+
+    for file in ${STAGED_NEW_FILES[@]+"${STAGED_NEW_FILES[@]}"}; do
+        if [[ "$file" != practice/leetcode/* ]]; then
+            continue
+        fi
+
+        if [[ "$file" == "$package_init" ]]; then
+            continue
+        fi
+
+        if [[ ! "$file" =~ $solution_pattern && ! "$file" =~ $init_pattern ]]; then
+            echo "Error: Invalid filename '$file'." >&2
+            echo "Files in 'practice/leetcode/' must be either:" >&2
+            echo "  - 'practice/leetcode/__init__.py'" >&2
+            echo "  - 'practice/leetcode/solutions_xxxxx/solution_xxxxx.py'" >&2
+            echo "  - 'practice/leetcode/solutions_xxxxx/__init__.py'" >&2
+            invalid=1
+        fi
+    done
+
+    return "$invalid"
+}
+
+collect_new_python_files() {
+    local file
+    NEW_PYTHON_FILES=()
+
+    for file in ${STAGED_NEW_FILES[@]+"${STAGED_NEW_FILES[@]}"}; do
+        if [[ "$file" == archive/* || "$file" == practice/leetcode/* ]]; then
+            continue
+        fi
+
+        if [[ "$file" == *.py && -f "$file" ]]; then
+            NEW_PYTHON_FILES+=("$file")
+        fi
+    done
+}
+
+validate_leetcode_filenames
+
+echo "Running pytest..."
+"$PYTHON_BIN" -m pytest -q
+
+declare -a NEW_PYTHON_FILES
+collect_new_python_files
+
+if [[ ${#NEW_PYTHON_FILES[@]:-0} -eq 0 ]]; then
+    echo "No newly added Python files staged for pylint."
+    exit 0
+fi
+
+echo "Running pylint on newly added Python files..."
+"$PYTHON_BIN" -m pylint --jobs=1 "${NEW_PYTHON_FILES[@]}"
