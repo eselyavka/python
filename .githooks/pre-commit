@@ -14,10 +14,10 @@ if [[ ! -x "$PYTHON_BIN" ]]; then
     exit 1
 fi
 
-declare -a STAGED_NEW_FILES=()
+declare -a STAGED_CHANGED_FILES=()
 while IFS= read -r -d '' file; do
-    STAGED_NEW_FILES+=("$file")
-done < <(git diff --cached --name-only --diff-filter=AR -z)
+    STAGED_CHANGED_FILES+=("$file")
+done < <(git diff --cached --name-only --diff-filter=ACMR -z)
 
 validate_leetcode_filenames() {
     local invalid=0
@@ -25,7 +25,7 @@ validate_leetcode_filenames() {
     local solution_pattern='^practice/leetcode/solutions_[0-9]{5}/solution_[0-9]{5}\.py$'
     local init_pattern='^practice/leetcode/solutions_[0-9]{5}/__init__\.py$'
 
-    for file in ${STAGED_NEW_FILES[@]+"${STAGED_NEW_FILES[@]}"}; do
+    for file in ${STAGED_CHANGED_FILES[@]+"${STAGED_CHANGED_FILES[@]}"}; do
         if [[ "$file" != practice/leetcode/* ]]; then
             continue
         fi
@@ -51,8 +51,8 @@ collect_new_python_files() {
     local file
     NEW_PYTHON_FILES=()
 
-    for file in ${STAGED_NEW_FILES[@]+"${STAGED_NEW_FILES[@]}"}; do
-        if [[ "$file" == archive/* || "$file" == practice/leetcode/* ]]; then
+    for file in ${STAGED_CHANGED_FILES[@]+"${STAGED_CHANGED_FILES[@]}"}; do
+        if [[ "$file" == archive/* ]]; then
             continue
         fi
 
@@ -71,9 +71,9 @@ declare -a NEW_PYTHON_FILES
 collect_new_python_files
 
 if [[ ${#NEW_PYTHON_FILES[@]:-0} -eq 0 ]]; then
-    echo "No newly added Python files staged for pylint."
+    echo "No changed Python files staged for pylint."
     exit 0
 fi
 
-echo "Running pylint on newly added Python files..."
+echo "Running pylint on changed Python files..."
 "$PYTHON_BIN" -m pylint --jobs=1 --fail-under="$PYLINT_FAIL_UNDER" "${NEW_PYTHON_FILES[@]}"
