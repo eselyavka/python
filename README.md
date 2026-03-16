@@ -23,6 +23,13 @@ The actively maintained root modules live under `src/`:
 ## Technical Assessments
 
 - `technical_assessments/`: standalone assessment/problem files
+- Representative files:
+  - `technical_assessments/akamai.py`
+  - `technical_assessments/carta.py`
+  - `technical_assessments/facebook.py`
+  - `technical_assessments/geotab.py`
+  - `technical_assessments/hrt.py`: grouped assessment problems including hollow-square rendering, bus commute scheduling, and board layout validation
+  - `technical_assessments/valid_number.py`
 
 ## Projects
 
@@ -45,7 +52,7 @@ The actively maintained root modules live under `src/`:
 Run the repo-level tests:
 
 ```bash
-python3 -m pytest
+~/.venv/py3_11/bin/python -m pytest
 ```
 
 Git commits use the tracked hook in `.githooks/pre-commit`.
