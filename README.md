@@ -40,6 +40,13 @@ The actively maintained root modules live under `src/`:
 - `practice/algorithms/`: standalone coding exercises
 - `practice/leetcode/`: LeetCode solutions archive
 
+LeetCode additions follow a lightweight convention:
+
+- place each solution in the matching hundred-bucket package using `solution_<problem_id>.py`
+- keep the solution self-contained and include a small `unittest` case in the same file
+- prefer the simplest efficient implementation before opening a PR
+- use commit titles like `Add LeetCode solution <problem_id>`
+
 ## Archive
 
 - `archive/`: archived scripts and reference files kept outside the active code paths
