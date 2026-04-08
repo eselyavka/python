@@ -12,43 +12,49 @@ class Solution(object):
         :type obstacles: List[List[int]]
         :rtype: int
         """
-        direction = {0: (0, 1),
-                     90: (1, 0),
-                     180: (0, -1),
-                     270: (-1, 0),
-                     -90: (-1, 0),
-                     -180: (0, -1),
-                     -270: (1, 0)}
-        angle = 0
-        path = (0, 0)
-        res = float('-inf')
-        obstacle_set = set(map(tuple, obstacles))
-        for cmd in commands:
-            # reset angle
-            if abs(angle) == 360:
-                angle = 0
-            if cmd in [-1, -2]:
-                angle = (angle + 90) if cmd == -1 else (angle - 90)
-            else:
-                x, y = path
-                x_i, y_i = direction[angle]
+        obstacles_set = set((x, y) for x, y in obstacles)
+        directions = [
+            (0, 1),
+            (1, 0),
+            (0, -1),
+            (-1, 0),
+        ]
+        direction_index = 0
+        x = 0
+        y = 0
+        max_distance = 0
 
-                for _ in range(cmd):
-                    x += x_i
-                    y += y_i
-                    if (x, y) in obstacle_set:
-                        break
-                    path = (x, y)
+        for command in commands:
+            if command == -1:
+                direction_index = (direction_index + 1) % 4
+                continue
 
-                res = max(res, path[0]**2 + path[1]**2)
-        return res
+            if command == -2:
+                direction_index = (direction_index - 1) % 4
+                continue
+
+            dx, dy = directions[direction_index]
+            while command > 0:
+                next_x = x + dx
+                next_y = y + dy
+                if (next_x, next_y) in obstacles_set:
+                    break
+
+                x = next_x
+                y = next_y
+                max_distance = max(max_distance, x * x + y * y)
+                command -= 1
+
+        return max_distance
 
 
 class TestSolution(unittest.TestCase):
 
     def test_robotSim(self):
         solution = Solution()
+        self.assertEqual(solution.robotSim([4, -1, 3], []), 25)
         self.assertEqual(solution.robotSim([4, -1, 4, -2, 4], [[2, 4]]), 65)
+        self.assertEqual(solution.robotSim([-1, -2, -1, -2], []), 0)
 
 
 if __name__ == '__main__':
