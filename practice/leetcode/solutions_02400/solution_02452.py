@@ -13,27 +13,22 @@ class Solution(object):
         :rtype: List[str]
         """
 
-        def compare(s1, s2):
-            i = 0
+        def within_two(word, target):
             edits = 0
-            while i < len(s1):
-                if s1[i] != s2[i]:
+            for a, b in zip(word, target):
+                if a != b:
                     edits += 1
                     if edits > 2:
-                        return -1
-                i += 1
+                        return False
 
-            return edits
+            return True
 
         ans = []
-        for q in queries:
-            flag = False
-            for d in dictionary:
-                q_cmp = compare(q, d)
-                if q_cmp >= 0:
-                    flag = True
-            if flag:
-                ans.append(q)
+        for query in queries:
+            for word in dictionary:
+                if within_two(query, word):
+                    ans.append(query)
+                    break
 
         return ans
 
