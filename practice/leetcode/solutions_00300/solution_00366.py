@@ -3,6 +3,7 @@
 """LeetCode solution 00366."""
 
 import unittest
+from collections import defaultdict
 
 class TreeNode(object):
     def __init__(self, val):
@@ -11,41 +12,26 @@ class TreeNode(object):
         self.right = None
 
 class Solution(object):
-    def removeLeaves(self, root):
-        if root is None:
-            return
-
-        if root.left is None and root.right is None:
-            del root
-            return
-
-        root.left = self.removeLeaves(root.left if root.left else None)
-        root.right = self.removeLeaves(root.right if root.right else None)
-
-        return root
-
-    def extractLeaves(self, root):
-        if root is None:
-            return []
-
-        if root.left is None and root.right is None:
-            return [root.val]
-
-        return (self.extractLeaves(root.left if root.left else None) +
-                self.extractLeaves(root.right if root.right else None))
-
     def findLeaves(self, root):
         """
         :type root: TreeNode
         :rtype: List[List[int]]
         """
+        mem = defaultdict(list)
 
-        res = []
+        def dfs(node):
+            if not node:
+                return -1
 
-        while root:
-            res.append(self.extractLeaves(root))
-            root = self.removeLeaves(root)
-        return res
+            left_height = dfs(node.left)
+            right_height = dfs(node.right)
+            height = 1 + max(left_height, right_height)
+
+            mem[height].append(node.val)
+            return height
+
+        dfs(root)
+        return list(mem.values())
 
 class TestSolution(unittest.TestCase):
 
