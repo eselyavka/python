@@ -20,27 +20,22 @@ class Solution(object):
         :type list2: ListNode
         :rtype: ListNode
         """
-        p1 = p2 = list1
-        p3 = list2
-        start = stop = None
-        i = 0
-        while p1:
-            if p1 and p1.next and (i+1) == a:
-                start = p1
-            if p1 and i == b:
-                stop = p1.next
-            i += 1
-            p1 = p1.next
+        prev_a = list1
+        for _ in range(a - 1):
+            prev_a = prev_a.next
 
-        start.next = list2
+        after_b = prev_a
+        for _ in range(b - a + 2):
+            after_b = after_b.next
 
-        while p3:
-            if p3 and p3.next is None:
-                p3.next = stop
-                break
-            p3 = p3.next
+        tail2 = list2
+        while tail2.next:
+            tail2 = tail2.next
 
-        return p2
+        prev_a.next = list2
+        tail2.next = after_b
+
+        return list1
 
 
 class TestSolution(unittest.TestCase):
