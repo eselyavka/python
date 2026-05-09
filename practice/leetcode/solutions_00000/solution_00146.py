@@ -29,14 +29,14 @@ class LRUCache(object):
         :type key: int
         :rtype: int
         """
-        if key in self.cache:
-            node = self.cache.get(key)
-            self.remove(node)
-            self.setHead(node)
+        node = self.cache.get(key)
+        if node:
+            self.remove_node(node)
+            self.set_head(node)
             return node.value
         return -1
 
-    def remove(self, n):
+    def remove_node(self, n):
         if n.prev is not None:
             n.prev.next = n.next
         else:
@@ -47,7 +47,7 @@ class LRUCache(object):
         else:
             self.tail = n.prev
 
-    def setHead(self, n):
+    def set_head(self, n):
         n.next = self.head
         n.prev = None
 
@@ -64,19 +64,21 @@ class LRUCache(object):
         :type value: int
         :rtype: void
         """
-        if key in self.cache:
-            node = self.cache.get(key)
-            node.key = key
+        if self.capacity == 0:
+            return
+
+        node = self.cache.get(key)
+        if node:
             node.value = value
-            self.remove(node)
-            self.setHead(node)
+            self.remove_node(node)
+            self.set_head(node)
         else:
             node = Node(key, value)
             if len(self.cache) >= self.capacity:
                 self.cache.pop(self.tail.key)
-                self.remove(self.tail)
+                self.remove_node(self.tail)
 
-            self.setHead(node)
+            self.set_head(node)
             self.cache[key] = node
 
 class _LRUCache(object):
@@ -129,6 +131,13 @@ class TestSolution(unittest.TestCase):
         self.assertEqual(cache.get(1), -1)
         self.assertEqual(cache.get(3), 3)
         self.assertEqual(cache.get(4), 4)
+
+    def test_LRUCache_with_zero_capacity(self):
+        cache = LRUCache(0)
+
+        cache.put(1, 1)
+
+        self.assertEqual(cache.get(1), -1)
 
 if __name__ == '__main__':
     unittest.main()
