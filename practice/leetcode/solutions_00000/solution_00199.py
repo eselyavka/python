@@ -3,7 +3,7 @@
 """LeetCode solution 00199."""
 
 import unittest
-from collections import defaultdict
+from collections import deque
 
 
 class TreeNode(object):
@@ -20,54 +20,24 @@ class Solution(object):
         :rtype: List[int]
         """
         if not root:
-            return root
-
-        s, res = [root], []
-
-        while s:
-            res.append(s[-1].val)
-            k = len(s)
-            for _ in range(k):
-                node = s.pop(0)
-                if node.left:
-                    s.append(node.left)
-                if node.right:
-                    s.append(node.right)
-
-        return res
-
-
-class Solution2(object):
-    def rightSideView(self, root):
-        """
-        :type root: TreeNode
-        :rtype: List[int]
-        """
-        if not root:
             return []
 
-        q = [(0, root)]
-        d = defaultdict(list)
-        max_level = 0
-
-        while q:
-            level, node = q[0]
-            max_level = max(max_level, level)
-            d[level].append(node.val)
-
-            if node.left:
-                q.append((level + 1, node.left))
-            if node.right:
-                q.append((level + 1, node.right))
-
-            q = q[1:]
-
+        queue = deque([root])
         ans = []
-        for level in range(max_level + 1):
-            ans.append(d[level][-1])
+
+        while queue:
+            level_size = len(queue)
+            for i in range(level_size):
+                node = queue.popleft()
+                if node.left:
+                    queue.append(node.left)
+                if node.right:
+                    queue.append(node.right)
+
+                if i == level_size - 1:
+                    ans.append(node.val)
 
         return ans
-
 
 class TestSolution(unittest.TestCase):
     def test_rightSideView(self):
@@ -78,10 +48,10 @@ class TestSolution(unittest.TestCase):
         root.right.right = TreeNode(4)
 
         solution = Solution()
-        solution2 = Solution2()
 
         self.assertListEqual(solution.rightSideView(root), [1, 3, 4])
-        self.assertListEqual(solution2.rightSideView(root), [1, 3, 4])
+
+        self.assertListEqual(solution.rightSideView(None), [])
 
 
 if __name__ == '__main__':
